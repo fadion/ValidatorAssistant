@@ -1,0 +1,22 @@
+{
+    "name": "fadion/validator-assistant",
+    "description": "Decouple validation from Laravel controllers with validation classes",
+    "keywords": ["laravel", "validation"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Fadion Dashi",
+            "email": "jonidashi@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "illuminate/support": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Fadion\\ValidatorAssistant": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
