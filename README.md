@@ -103,7 +103,7 @@ In addition to the defined rules and messages, you can easily add dynamic ones w
 $userValidator = new UserValidator(Input::all());
 
 // New rules or messages will be added or overwrite existing
-ones. Rules are defined for the current "scope" only.
+// ones. Rules are defined for the current "scope" only.
 $userValidator->setRule('age', 'required|numeric|min:13');
 $userValidator->setMessage('age.min', "Grow up mate!");
 ```
