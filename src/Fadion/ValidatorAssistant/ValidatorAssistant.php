@@ -1,17 +1,17 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-class ValidatorAssistant
+abstract class ValidatorAssistant
 {
 
     /**
      * @var array Validation rules
      */
-    protected $rules = [];
+    protected $rules = array();
 
     /**
      * @var array Validation messages
      */
-    protected $messages = [];
+    protected $messages = array();
 
     /**
      * @var \Illuminate\Validation\Validator Validator instance
@@ -146,17 +146,29 @@ class ValidatorAssistant
      */
     protected function resolveScope($scope, $rules)
     {
+        // No scope defined in rules.
+        // Return the rules as is.
         if (count($rules) == 1)
         {
             return $rules;
         }
+        // Scope not required or scope is 'default'.
+        // Return the 'default' scope.
         elseif ((is_null($scope) or $scope == 'default') and isset($rules['default']))
         {
             return $rules['default'];
         }
+        // Scope set and a default ruleset exists.
+        // Return the two as a merged array.
         elseif (isset($rules[$scope]) and isset($rules['default']))
         {
             return array_merge($rules['default'], $rules[$scope]);
+        }
+        // Scopet set but no default exists.
+        // Return only the scope ruleset.
+        elseif (isset($rules[$scope]))
+        {
+            return $rules[$scope];
         }
 
         return false;
