@@ -8,7 +8,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 ```json
 {
-    require: {
+    "require": {
         "fadion/validator-assistant": "dev-master"
     }
 }
@@ -23,7 +23,6 @@ ValidatorAssistant can be extended by any class and doesn't know or care of the 
 A validation class:
 
 ```php
-<?php
 class UserValidator extends ValidatorAssistant
 {
 
@@ -49,7 +48,6 @@ class UserValidator extends ValidatorAssistant
 With the rules and messages in the validation class defined, a typical workflow in a controller would be as follows:
 
 ```php
-<?php
 // Fictional controller "UseController" and action "add"
 
 $userValidator = new UserValidator(Input::all());
@@ -60,13 +58,13 @@ if ($userValidator->fails())
 }
 ```
 
-Pretty neat, right?! Whenever you'll need to validate a form, just call the appropriate validation class and you'll be done with a few lines of code.
+Pretty neat, right?! Whenever you'll need to validate a model or form, just call the appropriate validation class and you'll be done with a few lines of code.
 
 ## Rules Scope
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
 
-When defining rules as an array, you can define as much scopes as you like. Look at the following example:
+When creating rules as an array, you can define as much scopes as you like. Look at the following example:
 
 ```php
 protected $rules = array(
@@ -95,7 +93,20 @@ $userValidator = new UserValidator(Input::all(), 'default');
 $userValidator = new UserValidator(Input::all());
 ```
 
-Consider the "default" scope as a shared ruleset that will be combined with any other scope you call. You can even define rules without a "default" scope if your validation sections are that different. In such a case, every scope will be a different ruleset and won't be combined with any other rules.
+Consider the "default" scope as a shared ruleset that will be combined with any other scope you call. You can even define rules without a "default" scope if your validation sections are that different. In such a case, every scope will be a different ruleset and won't be combined with any other rule.
+
+## Dynamics Rules and Messages
+
+In addition to the defined rules and messages, you can easily add dynamic ones when the need rises. This is a convenient functionality, but should be used rarely because it defeats the purpose. In addition, they trigger a rerun of Laravel's Validator, so there's a small performance penalty too. Said that, let's quickly see how they work.
+
+```php
+$userValidator = new UserValidator(Input::all());
+
+// New rules or messages will be added or overwrite existing
+ones. Rules are defined for the current "scope" only.
+$userValidator->setRule('age', 'required|numeric|min:13');
+$userValidator->setMessage('age.min', "Grow up mate!");
+```
 
 ## More than Simple Arrays
 
@@ -104,7 +115,6 @@ We've seen how rules and messages can be defined inside a validation class. Howe
 Just as an example to give you the idea, using the UserValidator we talked about earlier:
 
 ```php
-<?php
 class UserValidator extends ValidatorAssistant
 {
 
@@ -125,6 +135,8 @@ class UserValidator extends ValidatorAssistant
         {
             return Redirect::route('some/route')->withInput()->withErrors($this->instance());
         }
+
+        return false;
     }
 
     public function saveUser()
@@ -141,4 +153,15 @@ class UserValidator extends ValidatorAssistant
     }
 
 }
+
+// Later in a controller
+
+$userValidator = new UserValidator(Input::all());
+
+if ($userValidator->redirectFailed())
+{
+    return $userValidator->redirectFailed();
+}
+
+$userValidator->saveUser();
 ```
