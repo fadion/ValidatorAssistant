@@ -145,10 +145,11 @@ abstract class ValidatorAssistant
     protected function resolveScope($scope)
     {
         $rules = $this->rules;
+        $firstElement = reset($rules);
 
         // No scope defined in rules.
         // Return the rules as is.
-        if (count($rules) == 1)
+        if (! is_array($rules[$firstElement]))
         {
             return $rules;
         }
