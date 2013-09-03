@@ -96,15 +96,15 @@ Consider the "default" scope as a shared ruleset that will be combined with any 
 
 ## Dynamics Rules and Messages
 
-In addition to the defined rules and messages, you can easily add dynamic ones when the need rises. This is a convenient functionality, but should be used rarely because it defeats the purpose. In addition, they trigger a rerun of Laravel's Validator, so there's a small performance penalty too. Said that, let's quickly see how they work.
+In addition to the defined rules and messages, you can easily add dynamic ones when the need rises. This is a convenient functionality for those rare occassions when rules have to contain dynamic parameters (like the "unique" rule).
 
 ```php
 $userValidator = new UserValidator(Input::all());
 
 // New rules or messages will be added or overwrite existing
 // ones. Rules are defined for the current "scope" only.
-$userValidator->setRule('age', 'required|numeric|min:13');
-$userValidator->setMessage('age.min', "Grow up mate!");
+$userValidator->setRule('email', 'required|email|unique:users,email,10');
+$userValidator->setMessage('email.unique', "Cmon!");
 ```
 
 ## More than Simple Arrays
