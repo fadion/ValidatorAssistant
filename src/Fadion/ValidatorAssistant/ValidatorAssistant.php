@@ -38,7 +38,7 @@ abstract class ValidatorAssistant
     public function __construct($inputs, $scope = null)
     {
         $this->inputs = $inputs;
-        $this->rulesSubset = $this->resolveScope($scope, $this->rules);
+        $this->rulesSubset = $this->resolveScope($scope);
 
         if (! $this->rulesSubset)
         {
@@ -144,8 +144,10 @@ abstract class ValidatorAssistant
      * @param array $rules
      * @return array|false
      */
-    protected function resolveScope($scope, $rules)
+    protected function resolveScope($scope)
     {
+        $rules = $this->rules;
+        
         // No scope defined in rules.
         // Return the rules as is.
         if (count($rules) == 1)
