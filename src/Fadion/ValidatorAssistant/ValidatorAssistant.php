@@ -44,8 +44,6 @@ abstract class ValidatorAssistant
         {
             throw new \Exception('No validation rules found');
         }
-
-        $this->validate();
     }
 
     /**
@@ -76,6 +74,8 @@ abstract class ValidatorAssistant
      */
     public function fails()
     {
+        $this->validate();
+
         return $this->validator->fails();
     }
 
@@ -86,6 +86,8 @@ abstract class ValidatorAssistant
      */
     public function passes()
     {
+        $this->validate();
+
         return $this->validator->passes();
     }
 
@@ -119,8 +121,6 @@ abstract class ValidatorAssistant
     public function setRule($rule, $value)
     {
         $this->rulesSubset[$rule] = $value;
-
-        $this->validate();
     }
 
     /**
@@ -133,8 +133,6 @@ abstract class ValidatorAssistant
     public function setMessage($message, $value)
     {
         $this->messages[$rule] = $value;
-
-        $this->validate();
     }
 
     /**
@@ -147,7 +145,7 @@ abstract class ValidatorAssistant
     protected function resolveScope($scope)
     {
         $rules = $this->rules;
-        
+
         // No scope defined in rules.
         // Return the rules as is.
         if (count($rules) == 1)
