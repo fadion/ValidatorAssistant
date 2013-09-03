@@ -34,8 +34,7 @@ class UserValidator extends ValidatorAssistant
     );
 
     // Error messages. When using Laravel's
-    // default error messages, leave this
-    // an empty array.
+    // default error messages, remove this property
     protected $messages = array(
         'username.required' => "Username is required",
         'email.required' => "Email is required",
