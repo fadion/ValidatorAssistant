@@ -167,12 +167,25 @@ abstract class ValidatorAssistant
     }
 
     /**
+     * Binds a rule parameter.
+     *
+     * @return void
+     */
+    public function bind()
+    {
+        if (func_num_args())
+        {
+            $this->prepareBindings(func_get_args());
+        }
+    }
+
+    /**
      * Sets a rule dynamically to the current scope.
      *
      * @param string $scope
      * @return array|false
      */
-    protected function resolveScope($scope)
+    private function resolveScope($scope)
     {
         $scope = ucfirst($scope);
 
@@ -196,6 +209,66 @@ abstract class ValidatorAssistant
         }
 
         return false;
+    }
+
+    /**
+     * Prepares binding parameters.
+     *
+     * @param array $args
+     * @return void
+     */
+    private function prepareBindings($args)
+    {
+        $bindings = [];
+
+        // Two parameters (key, value).
+        if (count($args) == 2)
+        {
+            $bindings[$args[0]] = $args[1];
+        }
+        // Array of parameters.
+        elseif (is_array($args[0]))
+        {
+            $bindings = $args[0];
+        }
+        // Multiple key-value parameters.
+        elseif (count($args) % 2 == 0)
+        {
+            for ($i = 0, $count = count($args); $i < $count; $i++)
+            {
+                if ($i % 2 == 0)
+                {
+                    $bindings[$args[$i]] = $args[$i + 1];
+                }
+            }
+        }
+
+        if (count($bindings))
+        {
+            $this->replaceBindings($bindings);
+        }
+    }
+
+    /**
+     * Replaces binding occurrences.
+     *
+     * @param array $bindings
+     * @return void
+     */
+    private function replaceBindings($bindings)
+    {
+        $search = array_keys($bindings);
+        $replace = array_values($bindings);
+
+        array_walk($search, function(&$value, $key)
+        {
+            $value = '{'.$value.'}';
+        });
+
+        array_walk_recursive($this->rulesSubset, function(&$value, $key) use($search, $replace)
+        {
+            $value = str_ireplace($search, $replace, $value);
+        });
     }
 
 }
