@@ -62,7 +62,7 @@ Pretty neat, right?! Whenever you'll need to validate a model or form, just call
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
 
-You can define as much scopes as you like using simple PHP class properties. Look at the following example:
+You can define as many scopes as you like using simple PHP class properties. Look at the following example:
 
 ```php
 // Default rules
@@ -71,11 +71,13 @@ protected $rules = array(
     'email' => 'required|email'
 );
 
+// Profile rules
 protected $rulesProfile => array(
     'name' => 'required',
     'age' => 'required|numeric|min:13'
 );
 
+// Registration rules
 protected $rulesRegister => array(
     'terms' => 'accepted'
 );
@@ -93,7 +95,7 @@ $userValidator = new UserValidator(Input::all(), 'profile');
 // Validates the 'register' rules
 $userValidator = new UserValidator(Input::all(), 'register');
 
-// Omitting the "scope" will validate the 'default' rules
+// Omitting the scope will validate the 'default' rules
 $userValidator = new UserValidator(Input::all());
 ```
 
@@ -110,7 +112,7 @@ $userValidator->setRule('email', 'required|email|unique:users,email,10');
 $userValidator->setMessage('email.unique', "Cmon!");
 ```
 
-There's also the `appendRule` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will overrive predefined rules with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
+There's also the `appendRule` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will overrive rules of the same type with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
 
 ```php
 // The combined rules will be: required|email|unique:users
@@ -129,9 +131,9 @@ protected $rules = array(
 );
 ```
 
-As easy as it gets! The names of the parameters aren't restricted in any way, as long as they're within curly braces and are unique, otherwise they'll get overwitten by preceeding rules. Now that you've got that cleared, let's bind those parameters to some real values.
+As easy as it gets! The names of the parameters aren't restricted in any way, as long as they're within curly braces and unique, otherwise they'll get overwitten by preceeding rules. Now that you've got that cleared, let's bind those parameters to some real values.
 
-There are basically 3 ways to bind parameters and we'll explore them in the following example:
+There are 4 ways to bind parameters and we'll explore them in the following example:
 
 ```php
 $userValidator = new UserValidator(Input::all());
@@ -143,7 +145,12 @@ $userValidator->bind('table', 'users')
 $userValidator->bind('date', '2012-12-12');
 
 // As an array
-$userValidator->bind(array('min' => 5, 'max' => 15, 'table' => 'users', 'date' => '2012-12-12'));
+$userValidator->bind(array(
+    'min' => 5,
+    'max' => 15,
+    'table' => 'users',
+    'date' => '2012-12-12'
+));
 
 // As pairs
 $userValidator->bind('min', 5, 'max', 15, 'table', 'users', 'date', '2012-12-12');
