@@ -271,4 +271,17 @@ abstract class ValidatorAssistant
         });
     }
 
+    /**
+     * Handle calls to inexistant methods.
+     */
+    public function __call($name, $args)
+    {
+        // Dynamic binding calls.
+        if (strpos($name, 'bind') !== false and count($args) == 1)
+        {
+            $name = strtolower(substr($name, strlen('bind')));
+            $this->replaceBindings(array($name => $args[0]));
+        }
+    }
+
 }
