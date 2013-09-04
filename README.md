@@ -33,8 +33,7 @@ class UserValidator extends ValidatorAssistant
         'email' => 'required|email'
     );
 
-    // Error messages. When using Laravel's
-    // default error messages, remove this property
+    // Error messages.
     protected $messages = array(
         'username.required' => "Username is required",
         'email.required' => "Email is required",
@@ -91,8 +90,8 @@ Now we'll initialize the validation class:
 // with the 'profile' ruleset taking precedence
 $userValidator = new UserValidator(Input::all(), 'profile');
 
-// Validates only the 'default' rules
-$userValidator = new UserValidator(Input::all(), 'default');
+// Validates the 'register' rules
+$userValidator = new UserValidator(Input::all(), 'register');
 
 // Omitting the "scope" will validate the 'default' rules
 $userValidator = new UserValidator(Input::all());
@@ -100,7 +99,7 @@ $userValidator = new UserValidator(Input::all());
 
 ## Dynamics Rules and Messages
 
-In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `setRule` and `setMessage` methods. This is a convenient functionality for those rare occassions when rules have to contain dynamic parameters (like the "unique" rule).
+In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `setRule` and `setMessage` methods. This is a convenient functionality for those occassions when rules have to contain dynamic parameters (like the "unique" rule).
 
 ```php
 $userValidator = new UserValidator(Input::all());
@@ -114,9 +113,49 @@ $userValidator->setMessage('email.unique', "Cmon!");
 There's also the `appendRule` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will overrive predefined rules with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
 
 ```php
-// The combined rules will be: required|email|unique:users,email,10
-$userValidator->appendRule('email', 'email|unique:users,email,10');
+// The combined rules will be: required|email|unique:users
+$userValidator->appendRule('email', 'email|unique:users');
 ```
+
+## Rules Parameter Binding
+
+As a completely different and [probably] more elegant approach to the setRule() and appendRule() methods, but with basically the same purpose, you can also use parameter binding. This is again useful for dynamic rules where variables are needed to be assigned. Let's start by writing some rules first and assign some parameters to them.
+
+```php
+protected $rules = array(
+    'username' => 'required|alpha|between:{min},{max}',
+    'email' => 'required|unique:{table}',
+    'birthday' => 'before:{date}'
+);
+```
+
+As easy as it gets! The names of the parameters aren't restricted in any way, as long as they're within curly braces and are unique, otherwise they'll get overwitten by preceeding rules. Now that you've got that cleared, let's bind those parameters to some real values.
+
+There are basically 3 ways to bind parameters and we'll explore them in the following example:
+
+```php
+$userValidator = new UserValidator(Input::all());
+
+// One by one
+$userValidator->bind('min', 5);
+$userValidator->bind('max', 15);
+$userValidator->bind('table', 'users')
+$userValidator->bind('date', '2012-12-12');
+
+// As an array
+$userValidator->bind(array('min' => 5, 'max' => 15, 'table' => 'users', 'date' => '2012-12-12'));
+
+// As pairs
+$userValidator->bind('min', 5, 'max', 15, 'table', 'users', 'date', '2012-12-12');
+
+// Overloading
+$userValidator->bindMin(5);
+$userValidator->bindMax(15);
+$userValidator->bindTable('users');
+$userValidator->bindDate('2012-12-12');
+```
+
+Each of the methods gets the same results, so use what you're more confortable with.
 
 ## More than Simple Arrays
 
