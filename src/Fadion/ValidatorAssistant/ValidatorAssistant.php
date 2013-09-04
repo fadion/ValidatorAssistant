@@ -151,8 +151,6 @@ abstract class ValidatorAssistant
 
         $this->rulesSubset[$rule] = array_unique(array_merge($subset, $value));
 
-        dd($this->rulesSubset[$rule]);
-
         return true;
     }
 
@@ -172,38 +170,29 @@ abstract class ValidatorAssistant
      * Sets a rule dynamically to the current scope.
      *
      * @param string $scope
-     * @param array $rules
      * @return array|false
      */
     protected function resolveScope($scope)
     {
-        $rules = $this->rules;
+        $scope = ucfirst($scope);
 
-        return $rules;
-
-        // No scope defined in rules.
-        // Return the rules as is.
-        if (count($rules) == 1)
-        {
-            return $rules;
-        }
-        // Scope not required or scope is 'default'.
+        // Scope not required.
         // Return the 'default' scope.
-        elseif ((is_null($scope) or $scope == 'default') and isset($rules['default']))
+        if (is_null($scope) and isset($this->rules))
         {
-            return $rules['default'];
+            return $this->rules;
         }
         // Scope set and a default ruleset exists.
         // Return the two as a merged array.
-        elseif (isset($rules[$scope]) and isset($rules['default']))
+        elseif (isset($this->{'rules'.$scope}) and isset($this->rules))
         {
-            return array_merge($rules['default'], $rules[$scope]);
+            return array_merge($this->rules, $this->{'rules'.$scope});
         }
-        // Scopet set but no default exists.
+        // Scope set but no default exists.
         // Return only the scope ruleset.
-        elseif (isset($rules[$scope]))
+        elseif (isset($this->{'rules'.$scope}))
         {
-            return $rules[$scope];
+            return $this->{'rules'.$scope};
         }
 
         return false;

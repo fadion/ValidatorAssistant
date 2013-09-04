@@ -63,20 +63,26 @@ Pretty neat, right?! Whenever you'll need to validate a model or form, just call
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
 
-When creating rules as an array, you can define as much scopes as you like. Look at the following example:
+You can define as much scopes as you like using simple PHP class properties. Look at the following example:
 
 ```php
+// Default rules
 protected $rules = array(
-    'default' => array(
-        'username' => 'required',
-        'email' => 'required|email'
-    ),
-    'profile' => array(
-        'name' => 'required',
-        'age' => 'required|numeric|min:13'
-    )
+    'username' => 'required',
+    'email' => 'required|email'
+);
+
+protected $rulesProfile => array(
+    'name' => 'required',
+    'age' => 'required|numeric|min:13'
+);
+
+protected $rulesRegister => array(
+    'terms' => 'accepted'
 );
 ```
+
+Consider the "default" scope (class property $rules) as a shared ruleset that will be combined with any other scope you call. As a convention, scope names should be of the "rulesName", otherwise it will fail to find the class property. For example: rulesLogin, rulesEdit or rulesDelete.
 
 Now we'll initialize the validation class:
 
@@ -88,11 +94,9 @@ $userValidator = new UserValidator(Input::all(), 'profile');
 // Validates only the 'default' rules
 $userValidator = new UserValidator(Input::all(), 'default');
 
-// Omitting the "scope" is the same as calling 'default'
+// Omitting the "scope" will validate the 'default' rules
 $userValidator = new UserValidator(Input::all());
 ```
-
-Consider the "default" scope as a shared ruleset that will be combined with any other scope you call. You can even define rules without a "default" scope if your validation sections are that different. In such a case, every scope will be a different ruleset and won't be combined with any other rule.
 
 ## Dynamics Rules and Messages
 
