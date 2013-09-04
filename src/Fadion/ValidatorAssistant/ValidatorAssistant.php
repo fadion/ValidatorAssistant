@@ -124,6 +124,39 @@ abstract class ValidatorAssistant
     }
 
     /**
+     * Appends a rule to an existing set.
+     *
+     * @param string $rule
+     * @param mixed $value
+     * @return bool
+     */
+    public function appendRule($rule, $value)
+    {
+        if (! isset($this->rulesSubset[$rule]))
+        {
+            return false;
+        }
+
+        $subset = $this->rulesSubset[$rule];
+
+        if (! is_array($subset))
+        {
+            $subset = explode('|', $subset);
+        }
+
+        if (! is_array($value))
+        {
+            $value = explode('|', $value);
+        }
+
+        $this->rulesSubset[$rule] = array_unique(array_merge($subset, $value));
+
+        dd($this->rulesSubset[$rule]);
+
+        return true;
+    }
+
+    /**
      * Sets a message dynamically.
      *
      * @param string $rule
@@ -145,11 +178,12 @@ abstract class ValidatorAssistant
     protected function resolveScope($scope)
     {
         $rules = $this->rules;
-        $firstElement = reset($rules);
+
+        return $rules;
 
         // No scope defined in rules.
         // Return the rules as is.
-        if (! is_array($rules[$firstElement]))
+        if (count($rules) == 1)
         {
             return $rules;
         }

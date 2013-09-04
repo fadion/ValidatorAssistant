@@ -96,7 +96,7 @@ Consider the "default" scope as a shared ruleset that will be combined with any 
 
 ## Dynamics Rules and Messages
 
-In addition to the defined rules and messages, you can easily add dynamic ones when the need rises. This is a convenient functionality for those rare occassions when rules have to contain dynamic parameters (like the "unique" rule).
+In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `setRule` and `setMessage` methods. This is a convenient functionality for those rare occassions when rules have to contain dynamic parameters (like the "unique" rule).
 
 ```php
 $userValidator = new UserValidator(Input::all());
@@ -105,6 +105,13 @@ $userValidator = new UserValidator(Input::all());
 // ones. Rules are defined for the current "scope" only.
 $userValidator->setRule('email', 'required|email|unique:users,email,10');
 $userValidator->setMessage('email.unique', "Cmon!");
+```
+
+There's also the `appendRule` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will overrive predefined rules with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
+
+```php
+// The combined rules will be: required|email|unique:users,email,10
+$userValidator->appendRule('email', 'email|unique:users,email,10');
 ```
 
 ## More than Simple Arrays
