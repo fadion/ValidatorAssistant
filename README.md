@@ -82,7 +82,7 @@ protected $rulesRegister => array(
 );
 ```
 
-Consider the "default" scope (class property $rules) as a shared ruleset that will be combined with any other scope you call. As a convention, scope names should be of the "rulesName", otherwise it will fail to find the class property. For example: rulesLogin, rulesEdit or rulesDelete.
+Consider the "default" scope (class property $rules) as a shared ruleset that will be combined with any other scope you call. As a convention, scope names should be of the "rulesName" format (camelCase), otherwise it will fail to find the class property. For example: rulesLogin, rulesEdit or rulesDelete.
 
 Now we'll initialize the validation class:
 
