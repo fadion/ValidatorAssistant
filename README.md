@@ -58,6 +58,38 @@ if ($userValidator->fails())
 
 Pretty neat, right?! Whenever you'll need to validate a model or form, just call the appropriate validation class and you'll be done with a few lines of code.
 
+## Sub Rules
+
+Array inputs are often helpful for organizing big forms, localized fields, etc. Unfortunately, the Laravel Validator doesn't support sub rules for the time being, so ValidatorAssistant will help you with that.
+
+Assuming you need to create some multi-lingual inputs, the HTML code will be as follows:
+
+```html
+<input type="text" name="title[sq]">
+<input type="text" name="title[en]">
+<input type="text" name="title[it]">
+```
+
+Setting rules for each of those inputs is as simple as writing a dot (literally).
+
+```php
+protected $rules = array(
+    'title.sq' => 'required',
+    'title.en' => 'max:15',
+    'title.it' => 'required|alpha'
+);
+```
+
+Writing rules with the dot notation for each key will validate them individually. Actually, what ValidatorAssistant does, is modify the rules and inputs arrays and add those subrules dynamically.
+
+There's also a modifier to validate all subrules, which is useful when keys are build programatically and each of them has the same validation rules.
+
+```php
+protected $rules = array(
+    'title.*' => 'required'
+);
+```
+
 ## Rules Scope
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
