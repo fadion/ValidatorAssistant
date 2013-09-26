@@ -44,6 +44,8 @@ abstract class ValidatorAssistant
         {
             throw new \Exception('No validation rules found');
         }
+
+        $this->subRules();
     }
 
     /**
@@ -269,6 +271,64 @@ abstract class ValidatorAssistant
         {
             $value = str_ireplace($search, $replace, $value);
         });
+    }
+
+    /**
+     * Resolves subrules.
+     *
+     * @param array $bindings
+     * @return void
+     */
+    private function subRules()
+    {
+        $rules = $this->rulesSubset;
+        $inputs = $this->inputs;
+
+        foreach ($rules as $name => $rule)
+        {
+            // Check for dot syntax.
+            if (strpos($name, '.') !== false)
+            {
+                $newName = substr($name, 0, strrpos($name, '.'));
+                $sub = substr($name, strrpos($name, '.') + 1);
+
+                // The subrule should exist in the input data
+                // and be an array.
+                if (isset($inputs[$newName]) and is_array($inputs[$newName]))
+                {
+                    unset($rules[$name]);
+
+                    // Prepare rules and inputs for an "*" (all) modifier.
+                    if ($sub == '*')
+                    {
+                        $subInputs = $inputs[$newName];
+                        unset($inputs[$newName]);
+
+                        foreach ($subInputs as $subKey => $subValue)
+                        {
+                            $rules[$newName.'_'.$subKey] = $rule;
+                            $inputs[$newName.'_'.$subKey] = $subValue;
+                        }
+                    }
+                    // Prepare rules and inputs for a named subrule.
+                    elseif (isset($inputs[$newName][$sub]))
+                    {
+                        $rules[$newName.'_'.$sub] = $rule;
+                        $inputs[$newName.'_'.$sub] = $inputs[$newName][$sub];
+
+                        unset($inputs[$newName][$sub]);
+
+                        if (! count($inputs[$newName]))
+                        {
+                            unset($inputs[$newName]);
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->rulesSubset = $rules;
+        $this->inputs = $inputs;
     }
 
     /**
