@@ -45,7 +45,7 @@ abstract class ValidatorAssistant
             throw new \Exception('No validation rules found');
         }
 
-        $this->subRules();
+        $this->fixSubRules();
     }
 
     /**
@@ -279,10 +279,11 @@ abstract class ValidatorAssistant
      * @param array $bindings
      * @return void
      */
-    private function subRules()
+    private function fixSubRules()
     {
         $rules = $this->rulesSubset;
         $inputs = $this->inputs;
+        $messages = $this->messages;
 
         foreach ($rules as $name => $rule)
         {
@@ -304,10 +305,18 @@ abstract class ValidatorAssistant
                         $subInputs = $inputs[$newName];
                         unset($inputs[$newName]);
 
+                        if (isset($messages[$name]))
+                        {
+                            $subMessage = $messages[$name];
+                            unset($messages[$name]);
+                        }
+
                         foreach ($subInputs as $subKey => $subValue)
                         {
                             $rules[$newName.'_'.$subKey] = $rule;
                             $inputs[$newName.'_'.$subKey] = $subValue;
+
+                            $messages[$newName.'_'.$subKey] = $subMessage;
                         }
                     }
                     // Prepare rules and inputs for a named subrule.
@@ -317,6 +326,13 @@ abstract class ValidatorAssistant
                         $inputs[$newName.'_'.$sub] = $inputs[$newName][$sub];
 
                         unset($inputs[$newName][$sub]);
+
+                        if (isset($messages[$name]))
+                        {
+                            $messages[$newName.'_'.$sub] = $messages[$name];
+
+                            unset($messages[$name]);
+                        }
 
                         if (! count($inputs[$newName]))
                         {
@@ -329,6 +345,7 @@ abstract class ValidatorAssistant
 
         $this->rulesSubset = $rules;
         $this->inputs = $inputs;
+        $this->messages = $messages;
     }
 
     /**
