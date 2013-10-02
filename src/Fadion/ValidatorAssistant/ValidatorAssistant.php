@@ -199,7 +199,7 @@ abstract class ValidatorAssistant
         }
         // Scope set and a default ruleset exists.
         // Return the two as a merged array.
-        elseif (isset($this->{'rules'.$scope}) and isset($this->rules))
+        elseif (isset($this->{'rules'.$scope}, $this->rules))
         {
             return array_merge($this->rules, $this->{'rules'.$scope});
         }
