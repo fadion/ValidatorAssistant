@@ -189,7 +189,7 @@ abstract class ValidatorAssistant
      */
     private function resolveScope($scope)
     {
-        $scope = ucfirst($scope);
+        $scope = 'rules' . ucfirst($scope);
 
         // Scope not required.
         // Return the 'default' scope.
@@ -199,15 +199,15 @@ abstract class ValidatorAssistant
         }
         // Scope set and a default ruleset exists.
         // Return the two as a merged array.
-        elseif (isset($this->{'rules'.$scope}) and isset($this->rules))
+        elseif (isset($this->$scope, $this->rules))
         {
-            return array_merge($this->rules, $this->{'rules'.$scope});
+            return array_merge($this->rules, $this->$scope);
         }
         // Scope set but no default exists.
         // Return only the scope ruleset.
-        elseif (isset($this->{'rules'.$scope}))
+        elseif (isset($this->$scope))
         {
-            return $this->{'rules'.$scope};
+            return $this->$scope;
         }
 
         return false;
