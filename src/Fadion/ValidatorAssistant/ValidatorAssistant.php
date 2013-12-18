@@ -35,9 +35,9 @@ abstract class ValidatorAssistant
      * @param  string  $scope
      * @return void
      */
-    public function __construct($inputs, $scope = null)
+    public function __construct($inputs = null, $scope = null)
     {
-        $this->inputs = $inputs;
+        $this->inputs = $inputs ?: \Input::all();
         $this->rulesSubset = $this->resolveScope($scope);
 
         if (! $this->rulesSubset)
@@ -46,6 +46,18 @@ abstract class ValidatorAssistant
         }
 
         $this->fixSubRules();
+    }
+    
+    /**
+     * Static shorthand for creating a new validator.
+     * 
+     * @param  array  $inputs
+     * @param  string  $scope
+     * @return ValidatorAssistant
+     */
+    public static function make($inputs = null, $scope = null)
+    {
+        return new static($inputs, $scope);
     }
 
     /**
