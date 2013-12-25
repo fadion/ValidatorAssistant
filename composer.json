@@ -1,7 +1,7 @@
 {
     "name": "fadion/validator-assistant",
     "description": "Decouple validation from Laravel controllers with ValidatorAssistant",
-    "keywords": ["laravel", "validation", "eloquent", "orm"],
+    "keywords": ["laravel", "validation"],
     "type": "library",
     "license": "MIT",
     "authors": [
