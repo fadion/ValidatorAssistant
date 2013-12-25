@@ -16,7 +16,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 2. Add `Fadion\ValidatorAssistant\ValidatorAssistantServiceProvider` to your `app/config/app.php` file, inside the `providers` array.
 
-3. (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php file, inside the `providers` array.
+3. (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php` file, inside the `aliases` array.
 
 ## Usage
 
@@ -68,6 +68,15 @@ if ($userValidator->fails())
 {
     return Redirect::back()->withInput()->withErrors($userValidator->instance());
 }
+```
+
+You can even omit the `Input::all()` call, as it will be called by default from ValidatorAssistant:
+
+```php
+$userValidator = UserValidator::make();
+
+// is the sames as
+$userValidator = UserValidator::make(Input::all());
 ```
 
 Pretty neat, right?! Whenever you'll need to validate a model or form, just call the appropriate validation class and you'll be done with a few lines of code.
@@ -174,7 +183,7 @@ $userValidator->addRule('email', 'required|email|unique:users,email,10');
 $userValidator->addMessage('email.unique', "Cmon!");
 ```
 
-There's also the `append` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will override rules of the same type with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
+There's also the `append` method that instead of rewritting a ruleset, will append new rules to it. It works only on an existing ruleset, but will fail silently. Additionally, it will override rules of the same type with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
 
 ```php
 // The combined rules will be: required|email|unique:users
@@ -183,7 +192,7 @@ $userValidator->append('email', 'email|unique:users');
 
 ## Parameter Binding
 
-As a completely different and [probably] more elegant approach to the `addRule()` and `append()` methods, but with basically the same purpose, you can also use parameter binding. This is again useful for dynamic rules where variables are needed to be assigned. Let's start by writing some rules first and assign some parameters to them.
+As a completely different and [probably] more elegant approach to the `addRule()` and `append()` methods, you can also use parameter binding. This is again useful for dynamic rules where variables are needed to be assigned. Let's start by writing some rules first and assign some parameters to them.
 
 ```php
 protected $rules = array(
@@ -207,12 +216,12 @@ $userValidator->bind('table', 'users')
 $userValidator->bind('date', '2012-12-12');
 
 // As an array
-$userValidator->bind(array(
+$userValidator->bind([
     'min' => 5,
     'max' => 15,
     'table' => 'users',
     'date' => '2012-12-12'
-));
+]);
 
 // Overloading
 $userValidator->bindMin(5);
