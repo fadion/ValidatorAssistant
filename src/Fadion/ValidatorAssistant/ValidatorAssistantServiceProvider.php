@@ -28,16 +28,7 @@ class ValidatorAssistantServiceProvider extends ServiceProvider {
 	 */
 	public function register()
 	{
-        $this->app['validator-assistant'] = $this->app->share(function($app)
-        {
-            return new ValidatorAssistant;
-        });
-
-        $this->app->booting(function()
-        {
-            $loader = \Illuminate\Foundation\AliasLoader::getInstance();
-            $loader->alias('ValidatorAssistant', 'Fadion\ValidatorAssistant\ValidatorAssistant');
-        });
+        //
 	}
 
 	/**

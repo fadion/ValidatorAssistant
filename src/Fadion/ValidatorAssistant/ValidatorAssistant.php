@@ -1,375 +1,282 @@
 <?php namespace Fadion\ValidatorAssistant;
 
+use Fadion\ValidatorAssistant\Bindings;
+use Fadion\ValidatorAssistant\Subrules;
+use Input;
+use Validator;
+
 abstract class ValidatorAssistant
 {
 
     /**
-     * @var array Validation rules
-     */
+    * @var array Validation rules
+    */
     protected $rules = array();
 
     /**
-     * @var array Validation messages
-     */
+    * @var array Validation messages
+    */
     protected $messages = array();
 
     /**
-     * @var \Illuminate\Validation\Validator Validator instance
-     */
-    protected $validator;
+    * @var \Illuminate\Validation\Validator Validator instance
+    */
+    private $validator;
 
     /**
-     * @var mixed Input(s) to be validated
-     */
-    protected $inputs;
+    * @var mixed Input(s) to be validated
+    */
+    private $inputs;
 
     /**
-     * @var array Rule's subset under a scope
-     */
-    protected $rulesSubset;
+    * @var array Rules after the scope is resolved
+    */
+    private $finalRules;
 
     /**
-     * Initialize the ValidatorAssistant class.
-     *
-     * @param  array  $inputs
-     * @param  string  $scope
-     * @return void
-     */
-    public function __construct($inputs = null, $scope = null)
+    * Initialize the ValidatorAssistant class.
+    *
+    * @param  array  $inputs
+    * @return void
+    */
+    public function __construct($inputs = null)
     {
-        $this->inputs = $inputs ?: \Input::all();
-        $this->rulesSubset = $this->resolveScope($scope);
-
-        if (! $this->rulesSubset)
-        {
-            throw new \Exception('No validation rules found');
-        }
-
-        $this->fixSubRules();
-    }
-    
-    /**
-     * Static shorthand for creating a new validator.
-     * 
-     * @param  array  $inputs
-     * @param  string  $scope
-     * @return ValidatorAssistant
-     */
-    public static function make($inputs = null, $scope = null)
-    {
-        return new static($inputs, $scope);
+        $this->inputs = $inputs ?: Input::all();
+        $this->finalRules = $this->rules;
     }
 
     /**
-     * Run the validation using Laravel's Validator.
-     *
-     * @return void
-     */
-    protected function validate()
+    * Static factory.
+    * 
+    * @param  array  $inputs
+    * @return ValidatorAssistant
+    */
+    public static function make($inputs = null)
     {
-        $this->validator = \Validator::make($this->inputs, $this->rulesSubset, $this->messages);
+        return new static($inputs);
     }
 
     /**
-     * Get the Validator instance. Useful when passing
-     * errors to a response.
-     *
-     * @return \Illuminate\Validation\Validator
-     */
+    * Checks if validation passed.
+    *
+    * @return bool
+    */
+    public function passes()
+    {
+        $this->validate();
+        return $this->validator->passes();
+    }
+
+    /**
+    * Checks if validation failed.
+    *
+    * @return bool
+    */
+    public function fails()
+    {
+        $this->validate();
+        return $this->validator->fails();
+    }
+
+    /**
+    * Run the validation using Laravel's Validator.
+    *
+    * @return void
+    */
+    private function validate()
+    {
+        // Try to resolve subrules if there are any
+        // as a final step before running the validator.
+        $this->resolveSubrules();
+
+        $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
+    }
+
+    /**
+    * Get the Validator instance. Useful when passing
+    * errors to a response.
+    *
+    * @return \Illuminate\Validation\Validator
+    */
     public function instance()
     {
         return $this->validator;
     }
 
     /**
-     * Checks if validation failed.
-     *
-     * @return bool
-     */
-    public function fails()
-    {
-        $this->validate();
-
-        return $this->validator->fails();
-    }
-
-    /**
-     * Checks if validation passed.
-     *
-     * @return bool
-     */
-    public function passes()
-    {
-        $this->validate();
-
-        return $this->validator->passes();
-    }
-
-    /**
-     * Get validation error messages.
-     *
-     * @return \Illuminate\Support\MessageBag
-     */
+    * Get validation error messages.
+    *
+    * @return \Illuminate\Support\MessageBag
+    */
     public function errors()
     {
         return $this->validator->messages();
     }
 
     /**
-     * Get the failed validation rules.
-     *
-     * @return array
-     */
+    * Alias of errors().
+    *
+    * @return \Illuminate\Support\MessageBag
+    */
+    public function messages()
+    {
+        return $this->validator->messages();
+    }
+
+    /**
+    * Get the failed validation rules.
+    *
+    * @return array
+    */
     public function failed()
     {
         return $this->validator->failed();
     }
 
     /**
-     * Sets a rule dynamically to the current scope.
-     *
-     * @param string $rule
-     * @param mixed $value
-     * @return void
-     */
-    public function setRule($rule, $value)
+    * Set the scope.
+    *
+    * @param string|array $scope
+    * @return ValidatorAssistant
+    */
+    public function scope($scope)
     {
-        $this->rulesSubset[$rule] = $value;
+        $this->finalRules = $this->resolveScope($scope);
+
+        return $this;
     }
 
     /**
-     * Appends a rule to an existing set.
-     *
-     * @param string $rule
-     * @param mixed $value
-     * @return bool
-     */
-    public function appendRule($rule, $value)
+    * Searches for scoped rules and merges them
+    * with the default ones.
+    *
+    * @param string|array $scope
+    * @return array
+    */
+    private function resolveScope($scope)
     {
-        if (! isset($this->rulesSubset[$rule]))
+        // Keep the scopes as an array, even
+        // when a single string is passed.
+        if (! is_array($scope)) $scope = array($scope);
+
+        // Add the base rules for later merging.
+        $scopedRules = array($this->rules);
+
+        foreach ($scope as $s)
         {
-            return false;
+            $name = 'rules'.ucfirst($s);
+
+            // The scoped rules must exist as a
+            // class property.
+            if (isset($this->$name))
+            {
+                $scopedRules[] = $this->$name;
+            }
         }
 
-        $subset = $this->rulesSubset[$rule];
-
-        if (! is_array($subset))
-        {
-            $subset = explode('|', $subset);
-        }
-
-        if (! is_array($value))
-        {
-            $value = explode('|', $value);
-        }
-
-        $this->rulesSubset[$rule] = array_unique(array_merge($subset, $value));
-
-        return true;
+        // Return an array with the merged rules.
+        return call_user_func_array('array_merge', $scopedRules);
     }
 
     /**
-     * Sets a message dynamically.
-     *
-     * @param string $rule
-     * @param mixed $value
-     * @return void
-     */
-    public function setMessage($message, $value)
+    * Runs the Subrules class to resolve
+    * subrules.
+    *
+    * @return void
+    */
+    private function resolveSubrules()
     {
-        $this->messages[$rule] = $value;
+        $subrules = new Subrules($this->inputs, $this->finalRules, $this->messages);
+
+        $this->finalRules = $subrules->rules();
+        $this->messages = $subrules->messages();
+        $this->inputs = $subrules->inputs();
     }
 
     /**
-     * Binds a rule parameter.
-     *
-     * @return void
-     */
+    * Adds a rules dynamically. Will override
+    * existing rules when a key already exists.
+    *
+    * @param string $rule
+    * @param mixed $value
+    * @return ValidatorAssistant
+    */
+    public function addRule($rule, $value)
+    {
+        $this->finalRules[$rule] = $value;
+
+        return $this;
+    }
+
+    /**
+    * Adds a message dynamically. Will override
+    * existing messages when a key already exists.
+    *
+    * @param string $message
+    * @param mixed $value
+    * @return ValidatorAssistant
+    */
+    public function addMessage($message, $value)
+    {
+        $this->messages[$message] = $value;
+
+        return $this;
+    }
+
+    /**
+    * Appends a rule to an existing set.
+    *
+    * @param string $rule
+    * @param mixed $value
+    * @return ValidatorAssistant
+    */
+    public function append($rule, $value)
+    {
+        if (isset($this->finalRules[$rule]))
+        {
+            $existing = $this->finalRules[$rule];
+
+            // String rules are transformed into an array,
+            // so they can be easily merged. Laravel's Validator
+            // accepts rules as arrays or strings.
+            if (! is_array($existing)) $existing = explode('|', $existing);
+            if (! is_array($value)) $value = explode('|', $value);
+
+            $this->finalRules[$rule] = implode('|', array_unique(array_merge($existing, $value)));
+        }
+
+        return $this;
+    }
+
+    /**
+    * Binds a rule parameter.
+    *
+    * @return ValidatorAssistant
+    */
     public function bind()
     {
         if (func_num_args())
         {
-            $this->prepareBindings(func_get_args());
+            $bindings = new Bindings(func_get_args(), $this->finalRules);
+            $this->finalRules = $bindings->rules();
         }
+
+        return $this;
     }
 
     /**
-     * Sets a rule dynamically to the current scope.
-     *
-     * @param string $scope
-     * @return array|false
-     */
-    private function resolveScope($scope)
-    {
-        $scope = ucfirst($scope);
-
-        // Scope not required.
-        // Return the 'default' scope.
-        if (is_null($scope) and isset($this->rules))
-        {
-            return $this->rules;
-        }
-        // Scope set and a default ruleset exists.
-        // Return the two as a merged array.
-        elseif (isset($this->{'rules'.$scope}) and isset($this->rules))
-        {
-            return array_merge($this->rules, $this->{'rules'.$scope});
-        }
-        // Scope set but no default exists.
-        // Return only the scope ruleset.
-        elseif (isset($this->{'rules'.$scope}))
-        {
-            return $this->{'rules'.$scope};
-        }
-
-        return false;
-    }
-
-    /**
-     * Prepares binding parameters.
-     *
-     * @param array $args
-     * @return void
-     */
-    private function prepareBindings($args)
-    {
-        $bindings = [];
-
-        // Two parameters (key, value).
-        if (count($args) == 2)
-        {
-            $bindings[$args[0]] = $args[1];
-        }
-        // Array of parameters.
-        elseif (is_array($args[0]))
-        {
-            $bindings = $args[0];
-        }
-        // Multiple key-value parameters.
-        elseif (count($args) % 2 == 0)
-        {
-            for ($i = 0, $count = count($args); $i < $count; $i++)
-            {
-                if ($i % 2 == 0)
-                {
-                    $bindings[$args[$i]] = $args[$i + 1];
-                }
-            }
-        }
-
-        if (count($bindings))
-        {
-            $this->replaceBindings($bindings);
-        }
-    }
-
-    /**
-     * Replaces binding occurrences.
-     *
-     * @param array $bindings
-     * @return void
-     */
-    private function replaceBindings($bindings)
-    {
-        $search = array_keys($bindings);
-        $replace = array_values($bindings);
-
-        array_walk($search, function(&$value, $key)
-        {
-            $value = '{'.$value.'}';
-        });
-
-        array_walk_recursive($this->rulesSubset, function(&$value, $key) use($search, $replace)
-        {
-            $value = str_ireplace($search, $replace, $value);
-        });
-    }
-
-    /**
-     * Resolves subrules.
-     *
-     * @param array $bindings
-     * @return void
-     */
-    private function fixSubRules()
-    {
-        $rules = $this->rulesSubset;
-        $inputs = $this->inputs;
-        $messages = $this->messages;
-
-        foreach ($rules as $name => $rule)
-        {
-            // Check for dot syntax.
-            if (strpos($name, '.') !== false)
-            {
-                $newName = substr($name, 0, strrpos($name, '.'));
-                $sub = substr($name, strrpos($name, '.') + 1);
-
-                // The subrule should exist in the input data
-                // and be an array.
-                if (isset($inputs[$newName]) and is_array($inputs[$newName]))
-                {
-                    unset($rules[$name]);
-
-                    // Prepare rules and inputs for an "*" (all) modifier.
-                    if ($sub == '*')
-                    {
-                        $subInputs = $inputs[$newName];
-                        unset($inputs[$newName]);
-
-                        if (isset($messages[$name]))
-                        {
-                            $subMessage = $messages[$name];
-                            unset($messages[$name]);
-                        }
-
-                        foreach ($subInputs as $subKey => $subValue)
-                        {
-                            $rules[$newName.'_'.$subKey] = $rule;
-                            $inputs[$newName.'_'.$subKey] = $subValue;
-
-                            $messages[$newName.'_'.$subKey] = $subMessage;
-                        }
-                    }
-                    // Prepare rules and inputs for a named subrule.
-                    elseif (isset($inputs[$newName][$sub]))
-                    {
-                        $rules[$newName.'_'.$sub] = $rule;
-                        $inputs[$newName.'_'.$sub] = $inputs[$newName][$sub];
-
-                        unset($inputs[$newName][$sub]);
-
-                        if (isset($messages[$name]))
-                        {
-                            $messages[$newName.'_'.$sub] = $messages[$name];
-
-                            unset($messages[$name]);
-                        }
-
-                        if (! count($inputs[$newName]))
-                        {
-                            unset($inputs[$newName]);
-                        }
-                    }
-                }
-            }
-        }
-
-        $this->rulesSubset = $rules;
-        $this->inputs = $inputs;
-        $this->messages = $messages;
-    }
-
-    /**
-     * Handle calls to inexistant methods.
-     */
+    * Catch dynamic binding calls.
+    */
     public function __call($name, $args)
     {
-        // Dynamic binding calls.
         if (strpos($name, 'bind') !== false and count($args) == 1)
         {
             $name = strtolower(substr($name, strlen('bind')));
-            $this->replaceBindings(array($name => $args[0]));
+            
+            $bindings = new Bindings(array(array($name => $args[0])), $this->finalRules);
+            $this->finalRules = $bindings->rules();
+
+            return $this;
         }
     }
 

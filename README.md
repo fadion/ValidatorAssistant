@@ -1,6 +1,6 @@
 # ValidatorAssistant
 
-Keep Laravel Controllers thin and reuse code by organizing validation rules and messages into simple classes. ValidatorAssistant is a small library built to be extended by those classes, so they can easily use Laravel's Validation system and a few additional features.
+Keep Laravel Controllers thin and reuse code by organizing validation rules and messages into dedicated classes. ValidatorAssistant is a small library built to be extended by those classes, so they can easily use Laravel's Validation system and a few additional features like subrules, scopes and binding.
 
 ## Installation
 
@@ -16,11 +16,13 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 2. Add `Fadion\ValidatorAssistant\ValidatorAssistantServiceProvider` to your `app/config/app.php` file, inside the `providers` array.
 
+3. (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php file, inside the `providers` array.
+
 ## Usage
 
-ValidatorAssistant can be extended by any class and doesn't know or care of the way you organize your validation classes. As a personal preference, I use a `app/validators` folder to store validation classes and have added it to the `classmap` option of composer.json for simple autoloading.
+ValidatorAssistant can be extended by any PHP class that follows just a few simple rules. As a personal preference, I use an `app/validators` folder to store validation classes and have added it to the `classmap` option of composer.json for simple autoloading. Probably it's a good idea to namespace them too. 
 
-A validation class:
+A validation class in action is written below. Note the $rules and $messages properties. For them to be "seen" by ValidatorAssistant, their visibility needs to be `protected` or `public`, but not `private`.
 
 ```php
 class UserValidator extends ValidatorAssistant
@@ -43,12 +45,24 @@ class UserValidator extends ValidatorAssistant
 }
 ```
 
+When namespaced, you would write it:
+
+```php
+namespace MyApp\Validators;
+
+// If the alias was added
+use ValidatorAssistant;
+
+// Without alias
+use Fadion\ValidatorAssistant\ValidatorAssistant;
+
+class UserValidator extends ValidatorAssistant {}
+```
+
 With the rules and messages in the validation class defined, a typical workflow in a controller would be as follows:
 
 ```php
-// Fictional controller "UseController" and action "add"
-
-$userValidator = new UserValidator(Input::all());
+$userValidator = UserValidator::make(Input::all());
 
 if ($userValidator->fails())
 {
@@ -60,9 +74,9 @@ Pretty neat, right?! Whenever you'll need to validate a model or form, just call
 
 ## Sub Rules
 
-Array inputs are often helpful for organizing big forms, localized fields, etc. Unfortunately, the Laravel Validator doesn't support sub rules for the time being, so ValidatorAssistant will help you with that.
+Array inputs are often helpful for organizing big forms, localized fields, etc. Unfortunately, the Laravel Validator doesn't support sub rules for the time being, so if you're stuck, ValidatorAssistant will be really helpful.
 
-Assuming you need to create some multi-lingual inputs, the HTML code will be as follows:
+Assuming you need to create some multi-lingual inputs, where a field will be treated as an array, the HTML code will be as follows:
 
 ```html
 <input type="text" name="title[sq]">
@@ -70,27 +84,41 @@ Assuming you need to create some multi-lingual inputs, the HTML code will be as 
 <input type="text" name="title[it]">
 ```
 
-Setting rules for each of those inputs is as simple as writing a dot (literally).
+Setting rules for each of those inputs is as simple as writing array keys.
 
 ```php
 protected $rules = array(
-    'title.sq' => 'required',
-    'title.en' => 'max:15',
-    'title.it' => 'required|alpha'
+    'title[sq]' => 'required',
+    'title[en]' => 'max:15',
+    'title[it]' => 'required|alpha'
 );
 ```
 
-Writing rules with the dot notation for each key will validate them individually. Actually, what ValidatorAssistant does, is modify the rules and inputs arrays and add those subrules dynamically.
+The same applies to messages.
 
-There's also a modifier to validate all subrules, which is useful when keys are build programatically and each of them has the same validation rules.
+```php
+protected $messages = array(
+    'title[sq].required' => 'Albanian title is required.',
+    'title[en].required' => 'English title is required.',
+    'title[it].required' => 'Italian title is required.'
+);
+```
+
+What ValidatorAssistant does in the background is run through all the rules, messages and inputs to modify them so they can be processed by Laravel's Validator. A `title[en]` rule is translated as `title_en` both for rules and inputs, and `title_en.required` for messages.
+
+There's also a handy, catch-all modifier to validate all subrules of an input, which is useful when keys are build programatically and each of them has the same validation rules. In the languages case, the example above could be written as:
 
 ```php
 protected $rules = array(
-    'title.*' => 'required'
+    'title[*]' => 'required'
+);
+
+protected $messages = array(
+    'title[*].required' => 'The title is required.'
 );
 ```
 
-## Rules Scope
+## Scoped Rules
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
 
@@ -122,38 +150,40 @@ Now we'll initialize the validation class:
 ```php
 // Validates the 'default' and 'profile' rules combined,
 // with the 'profile' ruleset taking precedence
-$userValidator = new UserValidator(Input::all(), 'profile');
+$userValidator = UserValidator::make(Input::all())->scope('profile');
 
-// Validates the 'register' rules
-$userValidator = new UserValidator(Input::all(), 'register');
+// Validates the 'default' and 'register' rules
+$userValidator = UserValidator::make(Input::all())->scope('register');
 
-// Omitting the scope will validate the 'default' rules
-$userValidator = new UserValidator(Input::all());
+// Validates the 'default', 'profile' and 'register' rules
+$userValidator = UserValidator::make(Input::all())->scope(['profile', 'register']);
+
+// Validates the 'default' rules only
+$userValidator = UserValidator::make(Input::all());
 ```
 
 ## Dynamics Rules and Messages
 
-In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `setRule` and `setMessage` methods. This is a convenient functionality for those occassions when rules have to contain dynamic parameters (like the "unique" rule).
+In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `addRule` and `addMessage` methods. This is a convenient functionality for those occassions when rules have to contain dynamic parameters or need to be added on the fly for certain actions.
 
 ```php
-$userValidator = new UserValidator(Input::all());
+$userValidator = UserValidator::make(Input::all());
 
-// New rules or messages will be added or overwrite existing
-// ones. Rules are defined for the current "scope" only.
-$userValidator->setRule('email', 'required|email|unique:users,email,10');
-$userValidator->setMessage('email.unique', "Cmon!");
+// New rules or messages will be added or overwrite existing ones
+$userValidator->addRule('email', 'required|email|unique:users,email,10');
+$userValidator->addMessage('email.unique', "Cmon!");
 ```
 
-There's also the `appendRule` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will overrive rules of the same type with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
+There's also the `append` method that instead of rewritting a ruleset, will append a new rule to it. It works only on an existing input, but will fail silently. Additionally, it will override rules of the same type with the new ones. Considering the previous example and supossing that the "email" field has already a "required" rule, we can append to it as follows:
 
 ```php
 // The combined rules will be: required|email|unique:users
-$userValidator->appendRule('email', 'email|unique:users');
+$userValidator->append('email', 'email|unique:users');
 ```
 
-## Rules Parameter Binding
+## Parameter Binding
 
-As a completely different and [probably] more elegant approach to the setRule() and appendRule() methods, but with basically the same purpose, you can also use parameter binding. This is again useful for dynamic rules where variables are needed to be assigned. Let's start by writing some rules first and assign some parameters to them.
+As a completely different and [probably] more elegant approach to the `addRule()` and `append()` methods, but with basically the same purpose, you can also use parameter binding. This is again useful for dynamic rules where variables are needed to be assigned. Let's start by writing some rules first and assign some parameters to them.
 
 ```php
 protected $rules = array(
@@ -165,10 +195,10 @@ protected $rules = array(
 
 As easy as it gets! The names of the parameters aren't restricted in any way, as long as they're within curly braces and unique, otherwise they'll get overwitten by preceeding rules. Now that you've got that cleared, let's bind those parameters to some real values.
 
-There are 4 ways to bind parameters and we'll explore them in the following example:
+There are 3 ways to bind parameters and we'll explore them in the following example:
 
 ```php
-$userValidator = new UserValidator(Input::all());
+$userValidator = UserValidator::make(Input::all());
 
 // One by one
 $userValidator->bind('min', 5);
@@ -184,9 +214,6 @@ $userValidator->bind(array(
     'date' => '2012-12-12'
 ));
 
-// As pairs
-$userValidator->bind('min', 5, 'max', 15, 'table', 'users', 'date', '2012-12-12');
-
 // Overloading
 $userValidator->bindMin(5);
 $userValidator->bindMax(15);
@@ -195,61 +222,3 @@ $userValidator->bindDate('2012-12-12');
 ```
 
 Each of the methods gets the same results, so use what you're more confortable with.
-
-## More than Simple Arrays
-
-We've seen how rules and messages can be defined inside a validation class. However, a class can do much more than that! You can create methods that do database work, create models, redirect and much more. It's up to you to decide how much logic will go to the validation classes and what makes sense.
-
-Just as an example to give you the idea, using the UserValidator we talked about earlier:
-
-```php
-class UserValidator extends ValidatorAssistant
-{
-
-    protected $rules = array(
-        'username' => 'required',
-        'email' => 'required|email'
-    );
-
-    protected $messages = array(
-        'username.required' => "Username is required",
-        'email.required' => "Email is required",
-        'email.email' => "Email is invalid"
-    );
-
-    public function redirectFailed()
-    {
-        if ($this->fails())
-        {
-            return Redirect::route('some/route')->withInput()->withErrors($this->instance());
-        }
-
-        return false;
-    }
-
-    public function saveUser()
-    {
-        if ($this->passes())
-        {
-            $user = User::create(array(
-                'username' => $this->inputs['username'],
-                'email' => $this->inputs['email']
-            ));
-
-            return $user;
-        }
-    }
-
-}
-
-// Later in a controller
-
-$userValidator = new UserValidator(Input::all());
-
-if ($userValidator->redirectFailed())
-{
-    return $userValidator->redirectFailed();
-}
-
-$userValidator->saveUser();
-```
