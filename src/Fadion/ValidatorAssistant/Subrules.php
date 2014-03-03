@@ -149,6 +149,10 @@ class Subrules
                 }
             }
         }
+        
+        $this->inputs = $inputs;
+        $this->rules = $rules;
+        $this->messages = $messages;
     }
 
     /**
