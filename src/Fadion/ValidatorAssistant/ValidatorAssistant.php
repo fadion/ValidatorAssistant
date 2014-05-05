@@ -2,6 +2,7 @@
 
 use Fadion\ValidatorAssistant\Bindings;
 use Fadion\ValidatorAssistant\Subrules;
+use Fadion\ValidatorAssistant\Aliases;
 use Input;
 use Validator;
 
@@ -88,6 +89,9 @@ abstract class ValidatorAssistant
         // Try to resolve subrules if there are any
         // as a final step before running the validator.
         $this->resolveSubrules();
+
+        // Try to resolve rules aliases if there are any.
+        $this->resolveAliases();
 
         $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
     }
@@ -191,6 +195,21 @@ abstract class ValidatorAssistant
         $this->finalRules = $subrules->rules();
         $this->messages = $subrules->messages();
         $this->inputs = $subrules->inputs();
+    }
+
+    /**
+    * Runs the Alises class to resolve
+    * rules aliases.
+    *
+    * @return void
+    */
+    private function resolveAliases()
+    {
+        $aliases = new Aliases($this->inputs, $this->finalRules, $this->messages);
+
+        $this->finalRules = $aliases->rules();
+        $this->messages = $aliases->messages();
+        $this->inputs = $aliases->inputs();
     }
 
     /**

@@ -16,7 +16,7 @@ class Subrules
     /**
     * @var array Validation messages
     */
-    protected $messages = array();
+    private $messages = array();
 
     /**
      * @var array Subrule delimiters
@@ -171,7 +171,7 @@ class Subrules
 
         foreach ($messages as $messageRule => $message)
         {
-            if (strpos($messageRule, $name) !== false)
+            if (strpos($messageRule, $name.'.') !== false)
             {
                 $toRemove = $messageRule;
                 $messageRule = substr($messageRule, strpos($messageRule, '.') + 1);

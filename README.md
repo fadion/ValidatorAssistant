@@ -127,6 +127,23 @@ protected $messages = array(
 );
 ```
 
+## Aliases
+
+Aliases are great for generating useful error messages straight out of the box. Let's assume we have a "date" input that is checked for validity against a "date" rule. When validation fails, the default error message would be: "The date is not a valid date.", which isn't very informative. Using aliases, you can provide a better name for your input fields.
+
+Just add your aliases in the `$rules` array as demonstrated below:
+
+```php
+protected $rules = array(
+    'date:Expiration Date' => 'date',
+    'name:Full Name' => 'required'
+);
+```
+
+Now, the generated error message will be quite more informative: "The Expiration Date is not a valid date.". You can even use aliases for non-English applications to translate input fields and combine them with the generic error messages.
+
+`Please note that for the moment, Aliases can't be used in combination with Sub Rules.`
+
 ## Scoped Rules
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
