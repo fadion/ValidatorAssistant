@@ -127,22 +127,29 @@ protected $messages = array(
 );
 ```
 
-## Aliases
+## Attribute Names
 
-Aliases are great for generating useful error messages straight out of the box. Let's assume we have a "date" input that is checked for validity against a "date" rule. When validation fails, the default error message would be: "The date is not a valid date.", which isn't very informative. Using aliases, you can provide a better name for your input fields.
+Laravel supports custom attribute names for fields, as an easy way to alias inputs and generate helpful error messages. ValidatorAssistant supports them too!
 
-Just add your aliases in the `$rules` array as demonstrated below:
+Just add an `$attribute` array as a class member of your validation class:
 
 ```php
 protected $rules = array(
-    'date:Expiration Date' => 'date',
-    'name:Full Name' => 'required'
+    'username' => 'required',
+    'email' => 'email'
+);
+
+// Custom attributes
+protected $attributes = array(
+    'username' => 'Your name',
+    'email' => 'Your email'
+);
+
+protected $messages = array(
+    'username.required' => ':attribute is required.',
+    'email.email' => ':attribute is not valid.'
 );
 ```
-
-Now, the generated error message will be quite more informative: "The Expiration Date is not a valid date.". You can even use aliases for non-English applications to translate input fields and combine them with the generic error messages.
-
-`Please note that for the moment, Aliases can't be used in combination with Sub Rules.`
 
 ## Scoped Rules
 
