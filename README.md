@@ -174,6 +174,11 @@ Take the following example:
 
 ```php
 protected $rules = array(
+    'title' => 'required',
+    'body' => 'required'
+);
+
+protected $filters = array(
     'title' => 'trim|ucwords',
     'body' => 'strip_tags'
 );
@@ -181,11 +186,12 @@ protected $rules = array(
 
 The "title" input will be filtered by using PHP's `trim()` and `ucwords()` functions, while the "body" input will be filtered by `strip_tags()`. Except for a few, most filters are their PHP function equivalent.
 
-There are also some filters that accept paramenters. For example, `ltrim` accepts a string parameter with the characters to trim:
+There are also some filters that accept paramenters. For example, `rtrim` accepts a string parameter with the characters to trim and `limit` accepts a parameter as the number of characters the string must be limited to:
 
 ```php
-protected $rules = array(
-    'title' => 'rtrim:abc'
+protected $filters = array(
+    'title' => 'rtrim:abc',
+    'body' => 'trim|limit:255'
 );
 ```
 
