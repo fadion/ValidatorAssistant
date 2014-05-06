@@ -192,9 +192,10 @@ abstract class ValidatorAssistant
     */
     private function resolveSubrules()
     {
-        $subrules = new Subrules($this->inputs, $this->finalRules, $this->messages);
+        $subrules = new Subrules($this->inputs, $this->finalRules, $this->attributes, $this->messages);
 
         $this->finalRules = $subrules->rules();
+        $this->attributes = $subrules->attributes();
         $this->messages = $subrules->messages();
         $this->inputs = $subrules->inputs();
     }

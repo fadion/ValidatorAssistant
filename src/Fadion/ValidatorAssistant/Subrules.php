@@ -14,6 +14,11 @@ class Subrules
     private $rules;
 
     /**
+    * @var array Custom attributes
+    */
+    private $attributes;
+
+    /**
     * @var array Validation messages
     */
     private $messages = array();
@@ -35,10 +40,11 @@ class Subrules
     * @param  string  $scope
     * @return void
     */
-    public function __construct($inputs, $rules, $messages)
+    public function __construct($inputs, $rules, $attributes, $messages)
     {
         $this->inputs = $inputs;
         $this->rules = $rules;
+        $this->attributes = $attributes;
         $this->messages = $messages;
 
         $this->process();
@@ -79,6 +85,17 @@ class Subrules
     }
 
     /**
+    * Get the attributes after subrules have
+    * been processed.
+    *
+    * @return array
+    */
+    public function attributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
     * Get the messages after subrules have
     * been processed.
     *
@@ -99,6 +116,7 @@ class Subrules
     {
         $inputs = $this->inputs;
         $rules = $this->rules;
+        $attributes = $this->attributes;
         $messages = $this->messages;
 
         foreach ($rules as $name => $rule)
@@ -122,12 +140,22 @@ class Subrules
 
                         $rules = $this->fixRules($rules, $rule, $name, $realName, $subKey);
                         $messages = $this->fixMessages($messages, $name, $realName, $subKey);
+
+                        if (isset($attributes[$name]))
+                        {
+                            $attributes = $this->fixRules($attributes, $attributes[$name], $name, $realName, $subKey);
+                        }
                     }
 
                     $messages = $this->removeMessage($messages);
 
                     unset($inputs[$realName]);
                     unset($rules[$name]);
+
+                    if (isset($attributes[$name]))
+                    {
+                        unset($attributes[$name]);
+                    }
                 }
                 // A specific subrule is found.
                 elseif (isset($inputs[$realName][$subName]))
@@ -135,6 +163,12 @@ class Subrules
                     $rules[$realName.'_'.$subName] = $rule;
                     $inputs[$realName.'_'.$subName] = $inputs[$realName][$subName];
                     $rules = $this->fixRules($rules, $rule, $name, $realName, $subName);
+
+                    if (isset($attributes[$name]))
+                    {
+                        $attributes = $this->fixRules($attributes, $attributes[$name], $name, $realName, $subName);
+                        unset($attributes[$name]);
+                    }
 
                     unset($rules[$name]);
                     unset($inputs[$realName][$subName]);
@@ -152,6 +186,7 @@ class Subrules
         
         $this->inputs = $inputs;
         $this->rules = $rules;
+        $this->attributes = $attributes;
         $this->messages = $messages;
     }
 
@@ -218,11 +253,14 @@ class Subrules
     */
     private function fixRules($rules, $rule, $name, $realName, $subName)
     {
-        $key = array_search($name, array_keys($rules));
+        if (isset($rules[$name]))
+        {
+            $key = array_search($name, array_keys($rules));
 
-        $rules = array_slice($rules, 0, $key, true) +
-                    array($realName.'_'.$subName => $rule) +
-                    array_slice($rules, $key, count($rules) - $key, true);
+            $rules = array_slice($rules, 0, $key, true) +
+                        array($realName.'_'.$subName => $rule) +
+                        array_slice($rules, $key, count($rules) - $key, true);
+        }
 
         return $rules;
     }
