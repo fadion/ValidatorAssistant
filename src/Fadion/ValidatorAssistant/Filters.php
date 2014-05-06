@@ -83,6 +83,7 @@ class Filters
     * Trim filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterTrim($value, $argument = null)
@@ -94,6 +95,7 @@ class Filters
     * Trim filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterLrim($value, $argument = null)
@@ -105,6 +107,7 @@ class Filters
     * Trim filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterRtrim($value, $argument = null)
@@ -116,6 +119,7 @@ class Filters
     * MD5 filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterMd5($value, $argument = null)
@@ -127,6 +131,7 @@ class Filters
     * Sha1 filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterSha1($value, $argument = null)
@@ -138,6 +143,7 @@ class Filters
     * URL Encode filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterUrlencode($value, $argument = null)
@@ -149,6 +155,7 @@ class Filters
     * URL Decode filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterUrldecode($value, $argument = null)
@@ -160,6 +167,7 @@ class Filters
     * Strip Tags filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterStripTags($value, $argument = null)
@@ -173,6 +181,7 @@ class Filters
     * HTMLEntities filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterHtmlentities($value, $argument = null)
@@ -184,6 +193,7 @@ class Filters
     * Base64 Encode filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterBase64Encode($value, $argument = null)
@@ -195,6 +205,7 @@ class Filters
     * Base64 Decode filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterBase64Decode($value, $argument = null)
@@ -206,6 +217,7 @@ class Filters
     * Lcfirst filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterLcfirst($value, $argument = null)
@@ -217,6 +229,7 @@ class Filters
     * Ucfirst filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterUcfirst($value, $argument = null)
@@ -228,6 +241,7 @@ class Filters
     * Ucwords filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterUcwords($value, $argument = null)
@@ -239,6 +253,7 @@ class Filters
     * Upper filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterUpper($value, $argument = null)
@@ -255,6 +270,7 @@ class Filters
     * Lower filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterLower($value, $argument = null)
@@ -271,6 +287,7 @@ class Filters
     * NL2BR filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterNl2br($value, $argument = null)
@@ -282,6 +299,7 @@ class Filters
     * Sanitize email filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterSanitizeEmail($value, $argument = null)
@@ -293,6 +311,7 @@ class Filters
     * Sanitize encoded filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterSanitizeEncoded($value, $argument = null)
@@ -304,6 +323,7 @@ class Filters
     * Sanitize string filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterSanitizeString($value, $argument = null)
@@ -315,11 +335,90 @@ class Filters
     * Sanitize url filter
     *
     * @param string $value
+    * @param string $argument
     * @return string
     */
     private function filterSanitizeUrl($value, $argument = null)
     {
         return filter_var($value, FILTER_SANITIZE_URL);
+    }
+
+    /**
+    * Limit filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    public function filterLimit($value, $argument = null)
+    {
+        if (! isset($argument))
+        {
+            $argument = 20;
+        }
+
+        if (strlen($value) > $argument)
+        {
+            $value = substr($value, 0, $argument).'...';
+        }
+
+        return $value;
+    }
+
+    /**
+    * Mask filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    public function filterMask($value, $argument = null)
+    {
+        $mask = '*';
+        if (isset($argument))
+        {
+            $mask = $argument;
+        }
+
+        $maskLength = round(strlen($value) * 0.7);
+
+        return str_repeat($mask, $maskLength).substr($value, $maskLength);
+    }
+
+    /**
+    * Alpha filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    public function filterAlpha($value, $argument = null)
+    {
+        return preg_replace("/[^A-Za-z]/", '', $value);
+    }
+
+    /**
+    * Alphanumeric filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    public function filterAlphanumeric($value, $argument = null)
+    {
+        return preg_replace("/[^[:alnum:]]/", '', $value);
+    }
+
+    /**
+    * Numeric filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    public function filterNumeric($value, $argument = null)
+    {
+        return preg_replace("/[^0-9]/", '', $value);
     }
 
 }

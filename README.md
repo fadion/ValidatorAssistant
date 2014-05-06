@@ -179,9 +179,9 @@ protected $rules = array(
 );
 ```
 
-The "title" input will be filter by using PHP's `trim()` and `ucwords()` functions, while the "body" input will be filter by `strip_tags()`. Most filters are their PHP function equivalent, except a few that are shorter.
+The "title" input will be filtered by using PHP's `trim()` and `ucwords()` functions, while the "body" input will be filtered by `strip_tags()`. Except for a few, most filters are their PHP function equivalent.
 
-There are also some filter that accept paramenters. For example, `ltrim` accepts a string parameter with the characters to trim:
+There are also some filters that accept paramenters. For example, `ltrim` accepts a string parameter with the characters to trim:
 
 ```php
 protected $rules = array(
@@ -205,29 +205,57 @@ $inputs = $userValidator->inputs();
 
 The available filters are documented below:
 
-```
-trim:[optional characters to be trimed] => trim()
-ltrim:[optional characters to be trimed] => ltrim()
-rtrim:[optional characters to be trimed] => rtrim()
-md5 => md5()
-sha1 => sha1()
-urlencode => url_encode()
-urldecode => url_decode()
-strip_tags => strip_tags()
-htmlentities => htmlentities()
-base64_encode => base64_encode()
-base64_decode => base64_decode()
-lcfirst => lcfirst()
-ucfirst => ucfirst()
-ucwords => ucwords()
-upper => strtoupper()
-lower => strtolower()
-nl2br => nl2br()
-sanitize_email => filter_var() with FILTER_SANITIZE_EMAIL filter
-sanitize_encoded => filter_var() with FILTER_SANITIZE_ENCODED filter
-sanitize_string => filter_var() with FILTER_SANITIZE_STRING filter
-sanitize_url => filter_var() with FILTER_SANITIZE_URL filter
-```
+`trim:[optional characters to be trimed] => trim()`
+
+`ltrim:[optional characters to be trimed] => ltrim()`
+
+`rtrim:[optional characters to be trimed] => rtrim()`
+
+`md5 => md5()`
+
+`sha1 => sha1()`
+
+`urlencode => url_encode()`
+
+`urldecode => url_decode()`
+
+`strip_tags => strip_tags()`
+
+`htmlentities => htmlentities()`
+
+`base64_encode => base64_encode()`
+
+`base64_decode => base64_decode()`
+
+`lcfirst => lcfirst()`
+
+`ucfirst => ucfirst()`
+
+`ucwords => ucwords()`
+
+`upper => strtoupper()`
+
+`lower => strtolower()`
+
+`nl2br => nl2br()`
+
+`sanitize_email => filter_var() with FILTER_SANITIZE_EMAIL filter`
+
+`sanitize_encoded => filter_var() with FILTER_SANITIZE_ENCODED filter`
+
+`sanitize_string => filter_var() with FILTER_SANITIZE_STRING filter`
+
+`sanitize_url => filter_var() with FILTER_SANITIZE_URL filter`
+
+`limit:[number of characters] => limits a string to a number of characters`
+
+`mask:[optional mask character] => masks a string with a mask character (default: *)`
+
+`alpha => converts a string to alphabet characters only`
+
+`alphanumeric => converts a string to alphanumeric characters only`
+
+'numeric' => converts a string to numeric characters only
 
 ## Scoped Rules
 
