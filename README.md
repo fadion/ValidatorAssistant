@@ -195,6 +195,21 @@ protected $filters = array(
 );
 ```
 
+As for anything else, sub rules can be set for filters too:
+
+```php
+protected $filters = array(
+    'title[sq]' => 'trim|ucfirst',
+    'title[en]' => 'trim|ucwords'
+);
+
+// or with the catch-all modifier
+
+protected $filters = array(
+    'title[*]' => 'trim|upper'
+);
+```
+
 Finally, you can even get the filtered inputs back if you want to use the transformed values, for database entry or anything else. Just run the `inputs()` method on the validator object after validation has run.
 
 ```php
