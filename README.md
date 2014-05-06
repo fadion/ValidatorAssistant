@@ -151,6 +151,21 @@ protected $messages = array(
 );
 ```
 
+Sub rules apply to attribute names in the same way as for rules and messages:
+
+```php
+protected $attributes = array(
+    'title[sq]' => 'Titulli',
+    'title[en]' => 'Title'
+);
+
+// or with the catch-all modifier
+
+protected $attributes = array(
+    'title[*]' => 'The title'
+);
+```
+
 ## Scoped Rules
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
