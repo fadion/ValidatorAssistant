@@ -255,7 +255,7 @@ The available filters are documented below:
 
 `alphanumeric => converts a string to alphanumeric characters only`
 
-'numeric' => converts a string to numeric characters only
+`numeric => converts a string to numeric characters only`
 
 ## Scoped Rules
 
