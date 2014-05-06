@@ -2,6 +2,7 @@
 
 use Fadion\ValidatorAssistant\Bindings;
 use Fadion\ValidatorAssistant\Subrules;
+use Fadion\ValidatorAssistant\Filters;
 use Input;
 use Validator;
 
@@ -17,6 +18,11 @@ abstract class ValidatorAssistant
     * @var array Custom attributes
     */
     protected $attributes = array();
+
+    /**
+    * @var array Filters
+    */
+    protected $filters = array();
 
     /**
     * @var array Validation messages
@@ -94,8 +100,23 @@ abstract class ValidatorAssistant
         // as a final step before running the validator.
         $this->resolveSubrules();
 
+        // Apply input filters
+        $filters = new Filters($this->inputs, $this->filters);
+        $this->inputs = $filters->apply();
+
         $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
         $this->validator->setAttributeNames($this->attributes);
+    }
+
+    /**
+    * Get the inputs. Especially useful for getting
+    * the filtered input values.
+    *
+    * @return array
+    */
+    public function inputs()
+    {
+        return $this->inputs;
     }
 
     /**
@@ -192,10 +213,11 @@ abstract class ValidatorAssistant
     */
     private function resolveSubrules()
     {
-        $subrules = new Subrules($this->inputs, $this->finalRules, $this->attributes, $this->messages);
+        $subrules = new Subrules($this->inputs, $this->finalRules, $this->attributes, $this->filters, $this->messages);
 
         $this->finalRules = $subrules->rules();
         $this->attributes = $subrules->attributes();
+        $this->filters = $subrules->filters();
         $this->messages = $subrules->messages();
         $this->inputs = $subrules->inputs();
     }

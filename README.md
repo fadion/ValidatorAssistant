@@ -166,6 +166,69 @@ protected $attributes = array(
 );
 ```
 
+## Filters
+
+There are occasions where input data needs to be transformed or sanitized in a certain way before validation. You can do it manually, or even easier, use filters. ValidatorAssistant's filters are defined exactly as rules, but with some specific keywords for each filter.
+
+Take the following example:
+
+```php
+protected $rules = array(
+    'title' => 'trim|ucwords',
+    'body' => 'strip_tags'
+);
+```
+
+The "title" input will be filter by using PHP's `trim()` and `ucwords()` functions, while the "body" input will be filter by `strip_tags()`. Most filters are their PHP function equivalent, except a few that are shorter.
+
+There are also some filter that accept paramenters. For example, `ltrim` accepts a string parameter with the characters to trim:
+
+```php
+protected $rules = array(
+    'title' => 'rtrim:abc'
+);
+```
+
+Finally, you can even get the filtered inputs back if you want to use the transformed values, for database entry or anything else. Just run the `inputs()` method on the validator object after validation has run.
+
+```php
+$userValidator = UserValidator::make(Input::all());
+
+if ($userValidator->fails())
+{
+    return Redirect::back()->withInput()->withErrors($userValidator->instance());
+}
+
+// Will return the filtered input data
+$inputs = $userValidator->inputs();
+```
+
+The available filters are documented below:
+
+```
+trim:[optional characters to be trimed] => trim()
+ltrim:[optional characters to be trimed] => ltrim()
+rtrim:[optional characters to be trimed] => rtrim()
+md5 => md5()
+sha1 => sha1()
+urlencode => url_encode()
+urldecode => url_decode()
+strip_tags => strip_tags()
+htmlentities => htmlentities()
+base64_encode => base64_encode()
+base64_decode => base64_decode()
+lcfirst => lcfirst()
+ucfirst => ucfirst()
+ucwords => ucwords()
+upper => strtoupper()
+lower => strtolower()
+nl2br => nl2br()
+sanitize_email => filter_var() with FILTER_SANITIZE_EMAIL filter
+sanitize_encoded => filter_var() with FILTER_SANITIZE_ENCODED filter
+sanitize_string => filter_var() with FILTER_SANITIZE_STRING filter
+sanitize_url => filter_var() with FILTER_SANITIZE_URL filter
+```
+
 ## Scoped Rules
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
