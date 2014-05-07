@@ -146,7 +146,7 @@ class Filters
     * @param string $argument
     * @return string
     */
-    private function filterUrlencode($value, $argument = null)
+    private function filterUrlEncode($value, $argument = null)
     {
         return urlencode($value);
     }
@@ -158,7 +158,7 @@ class Filters
     * @param string $argument
     * @return string
     */
-    private function filterUrldecode($value, $argument = null)
+    private function filterUrlDecode($value, $argument = null)
     {
         return urldecode($value);
     }

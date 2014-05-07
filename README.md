@@ -236,9 +236,9 @@ The available filters are documented below:
 
 `sha1 => sha1($input)`
 
-`urlencode => url_encode($input)`
+`url_encode => url_encode($input)`
 
-`urldecode => url_decode($input)`
+`url_decode => url_decode($input)`
 
 `strip_tags => strip_tags($input)`
 
