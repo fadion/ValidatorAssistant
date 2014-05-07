@@ -296,6 +296,40 @@ class Filters
     }
 
     /**
+    * Date filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    private function filterDate($value, $argument = null)
+    {
+        if ($argument)
+        {
+            $value = date($argument, strtotime($value));
+        }
+
+        return $value;
+    }
+
+    /**
+    * Number Format filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return string
+    */
+    private function filterNumberFormat($value, $argument = null)
+    {
+        if ($argument and is_int($argument))
+        {
+            $value = number_format($value, $argument);
+        }
+
+        return $value;
+    }
+
+    /**
     * Sanitize email filter
     *
     * @param string $value
