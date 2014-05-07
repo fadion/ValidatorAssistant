@@ -226,47 +226,51 @@ $inputs = $userValidator->inputs();
 
 The available filters are documented below:
 
-`trim:[optional characters to be trimed] => trim()`
+`trim:[optional characters to be trimed] => trim($input, $chars)`
 
-`ltrim:[optional characters to be trimed] => ltrim()`
+`ltrim:[optional characters to be trimed] => ltrim($input, $chars)`
 
-`rtrim:[optional characters to be trimed] => rtrim()`
+`rtrim:[optional characters to be trimed] => rtrim($input, $chars)`
 
-`md5 => md5()`
+`md5 => md5($input)`
 
-`sha1 => sha1()`
+`sha1 => sha1($input)`
 
-`urlencode => url_encode()`
+`urlencode => url_encode($input)`
 
-`urldecode => url_decode()`
+`urldecode => url_decode($input)`
 
-`strip_tags => strip_tags()`
+`strip_tags => strip_tags($input)`
 
-`htmlentities => htmlentities()`
+`htmlentities => htmlentities($input)`
 
-`base64_encode => base64_encode()`
+`base64_encode => base64_encode($input)`
 
-`base64_decode => base64_decode()`
+`base64_decode => base64_decode($input)`
 
-`lcfirst => lcfirst()`
+`lcfirst => lcfirst($input)`
 
-`ucfirst => ucfirst()`
+`ucfirst => ucfirst($input)`
 
-`ucwords => ucwords()`
+`ucwords => ucwords($input)`
 
-`upper => strtoupper()`
+`upper => strtoupper($input)`
 
-`lower => strtolower()`
+`lower => strtolower($input)`
 
-`nl2br => nl2br()`
+`nl2br => nl2br($input)`
 
-`sanitize_email => filter_var() with FILTER_SANITIZE_EMAIL filter`
+`date:[date format] => date($format, strtotime($input))`
 
-`sanitize_encoded => filter_var() with FILTER_SANITIZE_ENCODED filter`
+`number_format:[decimals] => number_format($input, $decimals)`
 
-`sanitize_string => filter_var() with FILTER_SANITIZE_STRING filter`
+`sanitize_email => filter_var($input, FILTER_SANITIZE_EMAIL)`
 
-`sanitize_url => filter_var() with FILTER_SANITIZE_URL filter`
+`sanitize_encoded => filter_var($input, FILTER_SANITIZE_ENCODED)`
+
+`sanitize_string => filter_var($input, FILTER_SANITIZE_STRING)`
+
+`sanitize_url => filter_var($input, FILTER_SANITIZE_URL)`
 
 `limit:[number of characters] => limits a string to a number of characters`
 
