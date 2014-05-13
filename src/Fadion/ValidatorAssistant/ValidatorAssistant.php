@@ -30,14 +30,14 @@ abstract class ValidatorAssistant
     protected $messages = array();
 
     /**
+    * @var mixed Input(s) to be validated
+    */
+    protected $inputs;
+
+    /**
     * @var \Illuminate\Validation\Validator Validator instance
     */
     private $validator;
-
-    /**
-    * @var mixed Input(s) to be validated
-    */
-    private $inputs;
 
     /**
     * @var array Rules after the scope is resolved
@@ -54,6 +54,13 @@ abstract class ValidatorAssistant
     {
         $this->inputs = $inputs ?: Input::all();
         $this->finalRules = $this->rules;
+
+        // Run the 'before' method, letting the
+        // user execute code before validation.
+        if (method_exists($this, 'before'))
+        {
+            $this->before();
+        }
     }
 
     /**
@@ -100,12 +107,20 @@ abstract class ValidatorAssistant
         // as a final step before running the validator.
         $this->resolveSubrules();
 
-        // Apply input filters
+        // Apply input filters.
         $filters = new Filters($this->inputs, $this->filters);
         $this->inputs = $filters->apply();
 
+        // Apply attributes.
         $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
         $this->validator->setAttributeNames($this->attributes);
+
+        // Run the 'after' method, letting the
+        // user execute code after validation.
+        if (method_exists($this, 'after'))
+        {
+            $this->after($this->validator);
+        }
     }
 
     /**

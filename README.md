@@ -386,3 +386,66 @@ $userValidator->bindDate('2012-12-12');
 ```
 
 Each of the methods gets the same results, so use what you're more confortable with.
+
+## Before and After Methods
+
+There are two methods that you can add to your validation classes and get them called by ValidatorAssistant. The `before` method will be run when the validation class has been initialized, just after the inputs and rules have been set. The `after` method will be run after validation has finished, as the last thing ValidatorAssistant does. There's no limitation to the code you can write inside them, but it would obviously make no sense if they contain some arbitrary code. They're better used for doing manipulations on rules, adding messages on certain conditions, etc.
+
+It's quite easy to add them:
+
+```php
+class UserValidator extends ValidatorAssistant
+{
+
+    protected $rules = array(/* some rules */);
+
+    protected function before()
+    {
+        // Rules, inputs, filters, attributes and
+        // messages can be manipulated.
+        $this->rules['username'] = 'required|alpha';
+        $this->inputs['username'] = strtoupper($this->inputs['username']);
+        $this->filters['username'] = 'trim';
+        $this->attributes['username'] = 'Your name';
+        $this->messages['username.required'] = "Username can't be empty.";
+    }
+
+    protected function after($validator)
+    {
+        if ($validator->fails())
+        {
+            // run some code
+        }
+    }
+
+}
+```
+
+As you can see, the `before` method is a good place for some manipulation logic or conditions. While the `after` method, which gets the validator instance as an argument, can be used for running code depending on the status of the validation.
+
+## Integrating Fadion/Rule
+
+[Rule](https://github.com/fadion/Rule) is another package of mine that allows expressive building of validation rules and messages, using methods instead of arrays. Go check it out!
+
+Integrating Rule with ValidatorAssistant is very easy using the `before()` method, as rules and messages can be build before actually running the validator.
+
+```php
+class UserValidator extends ValidatorAssistant
+{
+
+    protected function before()
+    {
+        Rule::add('username')->required()->alpha();
+        Rule::add('email')->required()->email();
+        Rule::add('password')->between(5, 15);
+
+        RuleMessage::add('username')
+                   ->required("Username is required.")
+                   ->alpha("Username should be alphanumeric.");
+
+        $this->rules = Rule::build();
+        $this->messages = RuleMessage::build();
+    }
+
+}
+```
