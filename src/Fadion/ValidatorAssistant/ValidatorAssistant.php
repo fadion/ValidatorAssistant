@@ -111,8 +111,12 @@ abstract class ValidatorAssistant
         $filters = new Filters($this->inputs, $this->filters);
         $this->inputs = $filters->apply();
 
-        // Apply attributes.
+        // Apply custom rules.
+        $this->customRules();
+
         $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
+
+        // Apply attributes.
         $this->validator->setAttributeNames($this->attributes);
 
         // Run the 'after' method, letting the
@@ -235,6 +239,38 @@ abstract class ValidatorAssistant
         $this->filters = $subrules->filters();
         $this->messages = $subrules->messages();
         $this->inputs = $subrules->inputs();
+    }
+
+    /**
+    * Applies custom rules.
+    *
+    * @return void
+    */
+    private function customRules()
+    {
+        // Get the methods of the calling class.
+        $methods = get_class_methods(get_called_class());
+
+        // Custom rule methods begin with "custom".
+        $methods = array_filter($methods, function($var)
+        {
+            return strpos($var, 'custom') !== false && $var !== 'customRules';
+        });
+
+        if (count($methods))
+        {
+            foreach ($methods as $method)
+            {
+                $self = $this;
+
+                // Extend the validator using the return value
+                // of the custom rule method.
+                Validator::extend('foo', function($attribute, $value, $parameters) use ($self, $method)
+                {
+                    return $self->$method($attribute, $value, $parameters);
+                });
+            }
+        }
     }
 
     /**

@@ -423,6 +423,34 @@ class UserValidator extends ValidatorAssistant
 
 As you can see, the `before` method is a good place for some manipulation logic or conditions. While the `after` method, which gets the validator instance as an argument, can be used for running code depending on the status of the validation.
 
+## Custom Rules
+
+Laravel supports custom rules via the `extend()` method of Validator. To make the process as easy as possible, custom rules can be created as methods inside validator classes. Those methods just need a "custom" prefix followed by the name of the custom rule and behave exactly as the closures described in Laravel's docs.
+
+```php
+class UserValidator extends ValidatorAssistant
+{
+
+    protected $rules = array(
+        'username' => 'required|foo',
+        'email' => 'foo_bar'
+    );
+
+    protected function customFoo($attribute, $value, $parameters)
+    {
+        return $value == 'foo';
+    }
+
+    protected function customFoo_bar($attribute, $value, $parameters)
+    {
+        return filter_var($value, FILTER_VALIDATE_EMAIL);
+    }
+
+}
+```
+
+The only convention is that method names should be camelCase, with a "custom" prefix and the first character of the rule name in uppercase. For example, "my_rule" should be written as "customMy_rule".
+
 ## Integrating Fadion/Rule
 
 [Rule](https://github.com/fadion/Rule) is another package of mine that allows expressive building of validation rules and messages, using methods instead of arrays. Go check it out!
