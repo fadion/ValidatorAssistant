@@ -40,9 +40,9 @@ abstract class ValidatorAssistant
     private $validator;
 
     /**
-    * @var array Rules after the scope is resolved
+    * @var array A copy of the validation rules
     */
-    private $finalRules;
+    private $originalRules;
 
     /**
     * Initialize the ValidatorAssistant class.
@@ -53,7 +53,6 @@ abstract class ValidatorAssistant
     public function __construct($inputs = null)
     {
         $this->inputs = $inputs ?: Input::all();
-        $this->finalRules = $this->rules;
 
         // Run the 'before' method, letting the
         // user execute code before validation.
@@ -61,6 +60,8 @@ abstract class ValidatorAssistant
         {
             $this->before();
         }
+
+        $this->originalRules = $this->rules;
     }
 
     /**
@@ -114,7 +115,7 @@ abstract class ValidatorAssistant
         // Apply custom rules.
         $this->customRules();
 
-        $this->validator = Validator::make($this->inputs, $this->finalRules, $this->messages);
+        $this->validator = Validator::make($this->inputs, $this->rules, $this->messages);
 
         // Apply attributes.
         $this->validator->setAttributeNames($this->attributes);
@@ -187,7 +188,7 @@ abstract class ValidatorAssistant
     */
     public function scope($scope)
     {
-        $this->finalRules = $this->resolveScope($scope);
+        $this->rules = $this->resolveScope($scope);
 
         return $this;
     }
@@ -206,7 +207,7 @@ abstract class ValidatorAssistant
         if (! is_array($scope)) $scope = array($scope);
 
         // Add the base rules for later merging.
-        $scopedRules = array($this->rules);
+        $scopedRules = array($this->originalRules);
 
         foreach ($scope as $s)
         {
@@ -232,9 +233,9 @@ abstract class ValidatorAssistant
     */
     private function resolveSubrules()
     {
-        $subrules = new Subrules($this->inputs, $this->finalRules, $this->attributes, $this->filters, $this->messages);
+        $subrules = new Subrules($this->inputs, $this->rules, $this->attributes, $this->filters, $this->messages);
 
-        $this->finalRules = $subrules->rules();
+        $this->rules = $subrules->rules();
         $this->attributes = $subrules->attributes();
         $this->filters = $subrules->filters();
         $this->messages = $subrules->messages();
@@ -288,7 +289,7 @@ abstract class ValidatorAssistant
     */
     public function addRule($rule, $value)
     {
-        $this->finalRules[$rule] = $value;
+        $this->rules[$rule] = $value;
 
         return $this;
     }
@@ -317,9 +318,9 @@ abstract class ValidatorAssistant
     */
     public function append($rule, $value)
     {
-        if (isset($this->finalRules[$rule]))
+        if (isset($this->rules[$rule]))
         {
-            $existing = $this->finalRules[$rule];
+            $existing = $this->rules[$rule];
 
             // String rules are transformed into an array,
             // so they can be easily merged. Laravel's Validator
@@ -327,7 +328,7 @@ abstract class ValidatorAssistant
             if (! is_array($existing)) $existing = explode('|', $existing);
             if (! is_array($value)) $value = explode('|', $value);
 
-            $this->finalRules[$rule] = implode('|', array_unique(array_merge($existing, $value)));
+            $this->rules[$rule] = implode('|', array_unique(array_merge($existing, $value)));
         }
 
         return $this;
@@ -342,8 +343,8 @@ abstract class ValidatorAssistant
     {
         if (func_num_args())
         {
-            $bindings = new Bindings(func_get_args(), $this->finalRules);
-            $this->finalRules = $bindings->rules();
+            $bindings = new Bindings(func_get_args(), $this->rules);
+            $this->rules = $bindings->rules();
         }
 
         return $this;
@@ -358,8 +359,8 @@ abstract class ValidatorAssistant
         {
             $name = strtolower(substr($name, strlen('bind')));
             
-            $bindings = new Bindings(array(array($name => $args[0])), $this->finalRules);
-            $this->finalRules = $bindings->rules();
+            $bindings = new Bindings(array(array($name => $args[0])), $this->rules);
+            $this->rules = $bindings->rules();
 
             return $this;
         }
