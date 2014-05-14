@@ -477,3 +477,33 @@ class UserValidator extends ValidatorAssistant
 
 }
 ```
+
+Scoped rules can be built with `Rule` too:
+
+```php
+public function before()
+{
+    Rule::add('username')->required()->alpha();
+    Rule::add('email')->required()->email();
+
+    $this->rules = Rule::build();
+
+    Rule::add('username')->required();
+    Rule::add('email')->email();
+
+    // Add a 'profile' scope
+    $this->rulesProfile = Rule::build();
+}
+```
+
+And finally, bindings:
+
+```php
+public function before()
+{
+    Rule::add('age')->min('{min}');
+    Rule::add('date')->date('{date}');
+
+    $this->rules = Rule::build();
+}
+```
