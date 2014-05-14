@@ -263,9 +263,14 @@ abstract class ValidatorAssistant
             {
                 $self = $this;
 
+                // Convert camelCase method name to snake_case
+                // custom rule name.
+                $customRule = snake_case($method);
+                $customRule = str_replace('custom_', '', $customRule);
+
                 // Extend the validator using the return value
                 // of the custom rule method.
-                Validator::extend('foo', function($attribute, $value, $parameters) use ($self, $method)
+                Validator::extend($customRule, function($attribute, $value, $parameters) use ($self, $method)
                 {
                     return $self->$method($attribute, $value, $parameters);
                 });

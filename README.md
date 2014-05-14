@@ -441,7 +441,7 @@ class UserValidator extends ValidatorAssistant
         return $value == 'foo';
     }
 
-    protected function customFoo_bar($attribute, $value, $parameters)
+    protected function customFooBar($attribute, $value, $parameters)
     {
         return filter_var($value, FILTER_VALIDATE_EMAIL);
     }
@@ -449,7 +449,7 @@ class UserValidator extends ValidatorAssistant
 }
 ```
 
-The only convention is that method names should be camelCase, with a "custom" prefix and the first character of the rule name in uppercase. For example, "my_rule" should be written as "customMy_rule".
+The only convention is that method names should begin with a "custom" prefix and the rule name in camelCase. For example, "my_rule" should be written as "customMyRule()".
 
 ## Integrating Fadion/Rule
 
