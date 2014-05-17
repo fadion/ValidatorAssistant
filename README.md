@@ -481,7 +481,7 @@ class UserValidator extends ValidatorAssistant
 Scoped rules can be built with `Rule` too:
 
 ```php
-public function before()
+protected function before()
 {
     Rule::add('username')->required()->alpha();
     Rule::add('email')->required()->email();
@@ -499,7 +499,7 @@ public function before()
 And finally, bindings:
 
 ```php
-public function before()
+protected function before()
 {
     Rule::add('age')->min('{min}');
     Rule::add('date')->date('{date}');
