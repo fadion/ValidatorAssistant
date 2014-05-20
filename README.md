@@ -465,14 +465,14 @@ class UserValidator extends ValidatorAssistant
     {
         Rule::add('username')->required()->alpha();
         Rule::add('email')->required()->email();
-        Rule::add('password')->between(5, 15);
 
-        RuleMessage::add('username')
-                   ->required("Username is required.")
-                   ->alpha("Username should be alphanumeric.");
+        // Rules with custom messages
+        Rule::add('password')
+            ->required()->message("Password is required.")
+            ->between(5, 15)->message("Password must be between 5 to 15 characters.");
 
-        $this->rules = Rule::build();
-        $this->messages = RuleMessage::build();
+        $this->rules = Rule::get();
+        $this->messages = RuleMessage::getMessages();
     }
 
 }
@@ -486,13 +486,13 @@ protected function before()
     Rule::add('username')->required()->alpha();
     Rule::add('email')->required()->email();
 
-    $this->rules = Rule::build();
+    $this->rules = Rule::get();
 
     Rule::add('username')->required();
     Rule::add('email')->email();
 
     // Add a 'profile' scope
-    $this->rulesProfile = Rule::build();
+    $this->rulesProfile = Rule::get();
 }
 ```
 
@@ -504,6 +504,6 @@ protected function before()
     Rule::add('age')->min('{min}');
     Rule::add('date')->date('{date}');
 
-    $this->rules = Rule::build();
+    $this->rules = Rule::get();
 }
 ```
