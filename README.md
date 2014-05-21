@@ -4,7 +4,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 ## Table of Contents
 
-- [Installation](#installtion)
+- [Installation](#installation)
 - [Usage](#usage)
 - [Sub Rules](#sub-rules)
 - [Attribute Names](#attribute-names)
