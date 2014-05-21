@@ -10,7 +10,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 - [Attribute Names](#attribute-names)
 - [Filters](#filters)
 - [Scoped Rules](#scoped-rules)
-- [Dynamic Rules and Messages](#dynamics-rules-and-messages)
+- [Dynamic Rules and Messages](#dynamic-rules-and-messages)
 - [Parameter Binding](#parameter-binding)
 - [Before and After Methods](#before-and-after-methods)
 - [Custom Rules](#custom-rules)
