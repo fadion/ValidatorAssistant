@@ -2,6 +2,20 @@
 
 Keep Laravel Controllers thin and reuse code by organizing validation rules and messages into dedicated classes. ValidatorAssistant is a small library built to be extended by those classes, so they can easily use Laravel's Validation system and a few additional features like subrules, scopes and binding.
 
+## Table of Contents
+
+- [Installation](#installtion)
+- [Usage](#usage)
+- [Sub Rules](#sub-rules)
+- [Attribute Names](#attribute-names)
+- [Filters](#filters)
+- [Scoped Rules](#scoped-rules)
+- [Dynamic Rules and Messages](#dynamics-rules-and-messages)
+- [Parameter Binding](#parameter-binding)
+- [Before and After Methods](#before-and-after-methods)
+- [Custom Rules](#custom-rules)
+- [Integrating Fadion/Rule](#integrating-fadionrule)
+
 ## Installation
 
 1. Add the package to your composer.json file and run `composer update`:
@@ -224,7 +238,7 @@ if ($userValidator->fails())
 $inputs = $userValidator->inputs();
 ```
 
-The available filters are documented below:
+**The available filters are documented below:**
 
 `trim:[optional characters to be trimed] => trim($input, $chars)`
 
@@ -326,7 +340,7 @@ $userValidator = UserValidator::make(Input::all())->scope(['profile', 'register'
 $userValidator = UserValidator::make(Input::all());
 ```
 
-## Dynamics Rules and Messages
+## Dynamic Rules and Messages
 
 In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `addRule` and `addMessage` methods. This is a convenient functionality for those occassions when rules have to contain dynamic parameters or need to be added on the fly for certain actions.
 
