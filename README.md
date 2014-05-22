@@ -18,8 +18,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 ## Installation
 
-1. Add the package to your composer.json file and run `composer update`:
-
+- Add the package to your composer.json file and run `composer update`:
 ```json
 {
     "require": {
@@ -27,8 +26,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
     }
 }
 ```
-
-2. (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php` file, inside the `aliases` array.
+- (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php` file, inside the `aliases` array.
 
 ## Usage
 
