@@ -45,6 +45,16 @@ abstract class ValidatorAssistant
     private $originalRules;
 
     /**
+     * @var array A copy of the validation attributes
+     */
+    private $originalAttributes;
+
+    /**
+     * @var array A copy of the validation messages
+     */
+    private $originalMessages;
+
+    /**
     * Initialize the ValidatorAssistant class.
     *
     * @param  array  $inputs
@@ -62,11 +72,13 @@ abstract class ValidatorAssistant
         }
 
         $this->originalRules = $this->rules;
+        $this->originalAttributes = $this->attributes;
+        $this->originalMessages = $this->messages;
     }
 
     /**
     * Static factory.
-    * 
+    *
     * @param  array  $inputs
     * @return ValidatorAssistant
     */
@@ -189,6 +201,8 @@ abstract class ValidatorAssistant
     public function scope($scope)
     {
         $this->rules = $this->resolveScope($scope);
+        $this->attributes = $this->resolveAttributes($scope);
+        $this->messages = $this->resolveMessages($scope);
 
         return $this;
     }
@@ -202,27 +216,66 @@ abstract class ValidatorAssistant
     */
     private function resolveScope($scope)
     {
+        return $this->resolve($scope, 'rules');
+    }
+
+    /**
+     * Searches for scoped attributes and merges them
+     * with the default ones.
+     *
+     * @param string|array $scope
+     * @return array
+     */
+    private function resolveAttributes($scope)
+    {
+        return $this->resolve($scope, 'attributes');
+    }
+
+
+    /**
+     * Searches for scoped messages and merges them
+     * with the default ones.
+     *
+     * @param string|array $scope
+     * @return array
+     */
+    private function resolveMessages($scope)
+    {
+        return $this->resolve($scope, 'messages');
+    }
+
+
+    /**
+     * Searches for scoped $property and merges them
+     * with the default ones.
+     *
+     * @param string|array $scope
+     * @param string|array $property
+     * @return array
+     */
+    private function resolve($scope, $property)
+    {
         // Keep the scopes as an array, even
         // when a single string is passed.
         if (! is_array($scope)) $scope = array($scope);
 
         // Add the base rules for later merging.
-        $scopedRules = array($this->originalRules);
+        $scoped = array($this->{'original'.ucfirst($property)});
 
         foreach ($scope as $s)
         {
-            $name = 'rules'.ucfirst($s);
+            $name = $property.studly_case($s);
 
-            // The scoped rules must exist as a
+            // The scoped attributes must exist as a
             // class property.
             if (isset($this->$name))
             {
-                $scopedRules[] = $this->$name;
+                $scoped[] = $this->$name;
             }
         }
 
         // Return an array with the merged rules.
-        return call_user_func_array('array_merge', $scopedRules);
+        return call_user_func_array('array_merge', $scoped);
     }
 
     /**
@@ -358,7 +411,7 @@ abstract class ValidatorAssistant
         if (strpos($name, 'bind') !== false and count($args) == 1)
         {
             $name = strtolower(substr($name, strlen('bind')));
-            
+
             $bindings = new Bindings(array(array($name => $args[0])), $this->rules);
             $this->rules = $bindings->rules();
 
