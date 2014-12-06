@@ -1,7 +1,6 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-class Subrules
-{
+class Subrules {
 
     /**
     * @var mixed Input(s) to be validated
@@ -137,35 +136,29 @@ class Subrules
         $filters = $this->filters;
         $messages = $this->messages;
 
-        foreach ($rules as $name => $rule)
-        {
+        foreach ($rules as $name => $rule) {
             // Check for a subrule syntax: rule[key].
-            if (preg_match('/(.+)'.preg_quote($this->delimiters[0]).'(.+)'.preg_quote($this->delimiters[1]).'/', $name, $matches))
-            {
+            if (preg_match('/(.+)'.preg_quote($this->delimiters[0]).'(.+)'.preg_quote($this->delimiters[1]).'/', $name, $matches)) {
                 $realName = $matches[1];
                 $subName = $matches[2];
 
                 if (! isset($inputs[$realName]) or ! is_array($inputs[$realName])) continue;
 
                 // An all modifier is found: rule[*].
-                if ($subName == '*')
-                {
+                if ($subName == '*') {
                     $subInputs = $inputs[$realName];
 
-                    foreach ($subInputs as $subKey => $subValue)
-                    {
+                    foreach ($subInputs as $subKey => $subValue) {
                         $inputs[$realName.'_'.$subKey] = $subValue;
 
                         $rules = $this->fixRules($rules, $rule, $name, $realName, $subKey);
                         $messages = $this->fixMessages($messages, $name, $realName, $subKey);
 
-                        if (isset($attributes[$name]))
-                        {
+                        if (isset($attributes[$name])) {
                             $attributes = $this->fixRules($attributes, $attributes[$name], $name, $realName, $subKey);
                         }
 
-                        if (isset($filters[$name]))
-                        {
+                        if (isset($filters[$name])) {
                             $filters = $this->fixRules($filters, $filters[$name], $name, $realName, $subKey);
                         }
                     }
@@ -175,31 +168,26 @@ class Subrules
                     unset($inputs[$realName]);
                     unset($rules[$name]);
 
-                    if (isset($attributes[$name]))
-                    {
+                    if (isset($attributes[$name])) {
                         unset($attributes[$name]);
                     }
 
-                    if (isset($filters[$name]))
-                    {
+                    if (isset($filters[$name])) {
                         unset($filters[$name]);
                     }
                 }
                 // A specific subrule is found.
-                elseif (isset($inputs[$realName][$subName]))
-                {
+                elseif (isset($inputs[$realName][$subName])) {
                     $rules[$realName.'_'.$subName] = $rule;
                     $inputs[$realName.'_'.$subName] = $inputs[$realName][$subName];
                     $rules = $this->fixRules($rules, $rule, $name, $realName, $subName);
 
-                    if (isset($attributes[$name]))
-                    {
+                    if (isset($attributes[$name])) {
                         $attributes = $this->fixRules($attributes, $attributes[$name], $name, $realName, $subName);
                         unset($attributes[$name]);
                     }
 
-                    if (isset($filters[$name]))
-                    {
+                    if (isset($filters[$name])) {
                         $filters = $this->fixRules($filters, $filters[$name], $name, $realName, $subName);
                         unset($filters[$name]);
                     }
@@ -207,8 +195,7 @@ class Subrules
                     unset($rules[$name]);
                     unset($inputs[$realName][$subName]);
 
-                    if (! count($inputs[$realName]))
-                    {
+                    if (! count($inputs[$realName])) {
                         unset($inputs[$realName]);
                     }
 
@@ -239,10 +226,8 @@ class Subrules
     {
         $toRemove = null;
 
-        foreach ($messages as $messageRule => $message)
-        {
-            if (strpos($messageRule, $name.'.') !== false)
-            {
+        foreach ($messages as $messageRule => $message) {
+            if (strpos($messageRule, $name.'.') !== false) {
                 $toRemove = $messageRule;
                 $messageRule = substr($messageRule, strpos($messageRule, '.') + 1);
 
@@ -250,8 +235,7 @@ class Subrules
             }
         }
 
-        if (isset($toRemove))
-        {
+        if (isset($toRemove)) {
             $this->messageKey = $toRemove;
         }
 
@@ -266,8 +250,7 @@ class Subrules
     */
     private function removeMessage($messages)
     {
-        if (! is_null($this->messageKey))
-        {
+        if (! is_null($this->messageKey)) {
             unset($messages[$this->messageKey]);
             $this->messageKey = null;
         }
@@ -288,13 +271,12 @@ class Subrules
     */
     private function fixRules($rules, $rule, $name, $realName, $subName)
     {
-        if (isset($rules[$name]))
-        {
+        if (isset($rules[$name])) {
             $key = array_search($name, array_keys($rules));
 
             $rules = array_slice($rules, 0, $key, true) +
-                        array($realName.'_'.$subName => $rule) +
-                        array_slice($rules, $key, count($rules) - $key, true);
+                     array($realName.'_'.$subName => $rule) +
+                     array_slice($rules, $key, count($rules) - $key, true);
         }
 
         return $rules;

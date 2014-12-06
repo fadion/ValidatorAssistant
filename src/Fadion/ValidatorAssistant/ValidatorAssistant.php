@@ -6,8 +6,7 @@ use Fadion\ValidatorAssistant\Filters;
 use Input;
 use Validator;
 
-abstract class ValidatorAssistant
-{
+abstract class ValidatorAssistant {
 
     /**
     * @var array Validation rules
@@ -71,8 +70,7 @@ abstract class ValidatorAssistant
 
         // Run the 'before' method, letting the
         // user execute code before validation.
-        if (method_exists($this, 'before'))
-        {
+        if (method_exists($this, 'before')) {
             $this->before();
         }
 
@@ -139,8 +137,7 @@ abstract class ValidatorAssistant
 
         // Run the 'after' method, letting the
         // user execute code after validation.
-        if (method_exists($this, 'after'))
-        {
+        if (method_exists($this, 'after')) {
             $this->after($this->validator);
         }
     }
@@ -267,35 +264,29 @@ abstract class ValidatorAssistant
         // Add the base rules for later merging.
         $scoped = array($this->{'original'.ucfirst($property)});
 
-        foreach ($scope as $s)
-        {
+        foreach ($scope as $s) {
             $name = $property.studly_case($s);
 
             // The scoped attributes must exist as a
             // class property.
-            if (isset($this->$name))
-            {
+            if (isset($this->$name)) {
                 $scoped[] = $this->$name;
             }
         }
 
         // Preserve scope values.
-        if ($this->preserveScopeValues)
-        {
+        if ($this->preserveScopeValues) {
             $merged = call_user_func_array('array_merge_recursive', $scoped);
 
             // Merge array values as a single, pipe
             // separated string.
-            foreach ($merged as $key => $value)
-            {
-                if (is_array($value))
-                {
+            foreach ($merged as $key => $value) {
+                if (is_array($value)) {
                     $merged[$key] = implode('|', $value);
                 }
             }
         }
-        else
-        {
+        else {
             $merged = call_user_func_array('array_merge', $scoped);
         }
 
@@ -330,15 +321,12 @@ abstract class ValidatorAssistant
         $methods = get_class_methods(get_called_class());
 
         // Custom rule methods begin with "custom".
-        $methods = array_filter($methods, function($var)
-        {
+        $methods = array_filter($methods, function($var) {
             return strpos($var, 'custom') !== false && $var !== 'customRules';
         });
 
-        if (count($methods))
-        {
-            foreach ($methods as $method)
-            {
+        if (count($methods)) {
+            foreach ($methods as $method) {
                 $self = $this;
 
                 // Convert camelCase method name to snake_case
@@ -348,8 +336,7 @@ abstract class ValidatorAssistant
 
                 // Extend the validator using the return value
                 // of the custom rule method.
-                Validator::extend($customRule, function($attribute, $value, $parameters) use ($self, $method)
-                {
+                Validator::extend($customRule, function($attribute, $value, $parameters) use ($self, $method) {
                     return $self->$method($attribute, $value, $parameters);
                 });
             }
@@ -395,8 +382,7 @@ abstract class ValidatorAssistant
     */
     public function append($rule, $value)
     {
-        if (isset($this->rules[$rule]))
-        {
+        if (isset($this->rules[$rule])) {
             $existing = $this->rules[$rule];
 
             // String rules are transformed into an array,
@@ -418,8 +404,7 @@ abstract class ValidatorAssistant
     */
     public function bind()
     {
-        if (func_num_args())
-        {
+        if (func_num_args()) {
             $bindings = new Bindings(func_get_args(), $this->rules);
             $this->rules = $bindings->rules();
         }
@@ -432,8 +417,7 @@ abstract class ValidatorAssistant
     */
     public function __call($name, $args)
     {
-        if (strpos($name, 'bind') !== false and count($args) == 1)
-        {
+        if (strpos($name, 'bind') !== false and count($args) == 1) {
             $name = strtolower(substr($name, strlen('bind')));
 
             $bindings = new Bindings(array(array($name => $args[0])), $this->rules);

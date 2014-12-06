@@ -1,7 +1,6 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-class Bindings
-{
+class Bindings {
 
     /**
     * @var array Validation rules
@@ -25,8 +24,7 @@ class Bindings
         $this->rules = $rules;
         $bindings = $this->prepare($args);
 
-        if (count($bindings))
-        {
+        if (count($bindings)) {
             $this->replace($bindings);
         }
     }
@@ -65,13 +63,11 @@ class Bindings
         $bindings = array();
 
         // Two parameters (key, value).
-        if (count($args) == 2)
-        {
+        if (count($args) == 2) {
             $bindings[$args[0]] = $args[1];
         }
         // Array of parameters.
-        elseif (is_array($args[0]))
-        {
+        elseif (is_array($args[0])) {
             $bindings = $args[0];
         }
 
@@ -89,13 +85,11 @@ class Bindings
         $search = array_keys($bindings);
         $replace = array_values($bindings);
 
-        foreach ($search as $key => &$value)
-        {
+        foreach ($search as $key => &$value) {
             $value = $this->delimiters[0].$value.$this->delimiters[1];
         }
 
-        array_walk_recursive($this->rules, function(&$value, $key) use($search, $replace)
-        {
+        array_walk_recursive($this->rules, function(&$value, $key) use($search, $replace) {
             $value = str_ireplace($search, $replace, $value);
         });
     }

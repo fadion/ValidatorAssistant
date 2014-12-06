@@ -1,7 +1,6 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-class Filters
-{
+class Filters {
 
     /**
     * @var array Filters
@@ -36,23 +35,18 @@ class Filters
         $filters = $this->filters;
         $inputs = $this->inputs;
 
-        if (count($filters))
-        {
-            foreach ($filters as $name => $filter)
-            {
+        if (count($filters)) {
+            foreach ($filters as $name => $filter) {
                 $rules = explode('|', $filter);
 
                 // At least a rule is set and the input
                 // field exists.
-                if (count($rules) and isset($inputs[$name]))
-                {
-                    foreach ($rules as $rule)
-                    {
+                if (count($rules) and isset($inputs[$name])) {
+                    foreach ($rules as $rule) {
                         $rule = explode(':', $rule);
 
                         $argument = null;
-                        if (isset($rule[1]))
-                        {
+                        if (isset($rule[1])) {
                             $argument = $rule[1];
                         }
 
@@ -63,8 +57,7 @@ class Filters
                         $method = 'filter'.$rule;
 
                         // Check if rule is defined as a class method.
-                        if (method_exists($this, $method))
-                        {
+                        if (method_exists($this, $method)) {
                             $inputs[$name] = $this->$method($inputs[$name], $argument);
                         }
                     }
@@ -258,8 +251,7 @@ class Filters
     */
     private function filterUpper($value, $argument = null)
     {
-        if (extension_loaded('mbstring'))
-        {
+        if (extension_loaded('mbstring')) {
             return mb_strtoupper($value);
         }
 
@@ -275,8 +267,7 @@ class Filters
     */
     private function filterLower($value, $argument = null)
     {
-        if (extension_loaded('mbstring'))
-        {
+        if (extension_loaded('mbstring')) {
             return mb_strtolower($value);
         }
         
@@ -304,8 +295,7 @@ class Filters
     */
     private function filterDate($value, $argument = null)
     {
-        if ($argument)
-        {
+        if ($argument) {
             $value = date($argument, strtotime($value));
         }
 
@@ -321,8 +311,7 @@ class Filters
     */
     private function filterNumberFormat($value, $argument = null)
     {
-        if ($argument and is_int($argument))
-        {
+        if ($argument and is_int($argument)) {
             $value = number_format($value, $argument);
         }
 
@@ -386,13 +375,11 @@ class Filters
     */
     public function filterLimit($value, $argument = null)
     {
-        if (! isset($argument))
-        {
+        if (! isset($argument)) {
             $argument = 20;
         }
 
-        if (strlen($value) > $argument)
-        {
+        if (strlen($value) > $argument) {
             $value = substr($value, 0, $argument).'...';
         }
 
@@ -409,8 +396,7 @@ class Filters
     public function filterMask($value, $argument = null)
     {
         $mask = '*';
-        if (isset($argument))
-        {
+        if (isset($argument)) {
             $mask = $argument;
         }
 

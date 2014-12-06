@@ -35,8 +35,7 @@ ValidatorAssistant can be extended by any PHP class that follows just a few simp
 A validation class in action is written below. Note the $rules and $messages properties. For them to be "seen" by ValidatorAssistant, their visibility needs to be `protected` or `public`, but not `private`.
 
 ```php
-class UserValidator extends ValidatorAssistant
-{
+class UserValidator extends ValidatorAssistant {
 
     // Validation rules, as you'd define them
     // for Laravel's Validator class.
@@ -74,8 +73,7 @@ With the rules and messages in the validation class defined, a typical workflow 
 ```php
 $userValidator = UserValidator::make(Input::all());
 
-if ($userValidator->fails())
-{
+if ($userValidator->fails()) {
     return Redirect::back()->withInput()->withErrors($userValidator->instance());
 }
 ```
@@ -225,8 +223,7 @@ Finally, you can even get the filtered inputs back if you want to use the transf
 ```php
 $userValidator = UserValidator::make(Input::all());
 
-if ($userValidator->fails())
-{
+if ($userValidator->fails()) {
     return Redirect::back()->withInput()->withErrors($userValidator->instance());
 }
 
@@ -361,9 +358,10 @@ Will produce the following rules when "profile" scope is selected, as scopes rep
 However, there may be scenarios when you'll need rules to be preserved, not replaced. To allow this, just add a class property in your validator classes:
 
 ```php
-class UserValidator extends ValidatorAssistant
-{
+class UserValidator extends ValidatorAssistant {
+
     protected $preserveScopeValues = true;
+
 }
 ```
 
@@ -444,8 +442,7 @@ There are two methods that you can add to your validation classes and get them c
 It's quite easy to add them:
 
 ```php
-class UserValidator extends ValidatorAssistant
-{
+class UserValidator extends ValidatorAssistant {
 
     protected $rules = array(/* some rules */);
 
@@ -462,8 +459,7 @@ class UserValidator extends ValidatorAssistant
 
     protected function after($validator)
     {
-        if ($validator->fails())
-        {
+        if ($validator->fails()) {
             // run some code
         }
     }
@@ -478,8 +474,7 @@ As you can see, the `before` method is a good place for some manipulation logic 
 Laravel supports custom rules via the `extend()` method of Validator. To make the process as easy as possible, custom rules can be created as methods inside validator classes. Those methods just need a "custom" prefix followed by the name of the custom rule and behave exactly as the closures described in Laravel's docs.
 
 ```php
-class UserValidator extends ValidatorAssistant
-{
+class UserValidator extends ValidatorAssistant {
 
     protected $rules = array(
         'username' => 'required|foo',
@@ -508,8 +503,7 @@ The only convention is that method names should begin with a "custom" prefix and
 Integrating Rule with ValidatorAssistant is very easy using the `before()` method, as rules and messages can be build before actually running the validator.
 
 ```php
-class UserValidator extends ValidatorAssistant
-{
+class UserValidator extends ValidatorAssistant {
 
     protected function before()
     {
