@@ -336,6 +336,46 @@ $userValidator = UserValidator::make(Input::all())->scope(['profile', 'register'
 $userValidator = UserValidator::make(Input::all());
 ```
 
+The default behaviour is to merge rules by replacing keys, so that scopes take precedence. This allows for more flexiblity and safer merging, as you can easily predict which rules will be computed.
+
+The following ruleset:
+
+```php
+protected $rules = [
+    'username' => 'required'
+];
+
+protected $rulesProfile = [
+    'username' => 'unique:users'
+];
+```
+
+Will produce the following rules when "profile" scope is selected, as scopes replace previous rules.
+
+```php
+[
+    'username' => 'unique:users'
+]
+```
+
+However, there may be scenarios when you'll need rules to be preserved, not replaced. To allow this, just add a class property in your validator classes:
+
+```php
+class UserValidator extends ValidatorAssistant
+{
+    protected $preserveScopeValues = true;
+}
+```
+
+The previous rules will be computed to:
+
+```php
+[
+    'username' => 'required|unique:users'
+]
+```
+
+
 ## Dynamic Rules and Messages
 
 In addition to the defined rules and messages, you can easily add dynamic ones when the need rises with the `addRule` and `addMessage` methods. This is a convenient functionality for those occassions when rules have to contain dynamic parameters or need to be added on the fly for certain actions.

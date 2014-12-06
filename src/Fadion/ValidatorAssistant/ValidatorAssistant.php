@@ -35,6 +35,11 @@ abstract class ValidatorAssistant
     protected $inputs;
 
     /**
+    * @var bool Preserve scope values
+    */
+    protected $preserveScopeValues = false;
+
+    /**
     * @var \Illuminate\Validation\Validator Validator instance
     */
     private $validator;
@@ -274,8 +279,27 @@ abstract class ValidatorAssistant
             }
         }
 
-        // Return an array with the merged rules.
-        return call_user_func_array('array_merge', $scoped);
+        // Preserve scope values.
+        if ($this->preserveScopeValues)
+        {
+            $merged = call_user_func_array('array_merge_recursive', $scoped);
+
+            // Merge array values as a single, pipe
+            // separated string.
+            foreach ($merged as $key => $value)
+            {
+                if (is_array($value))
+                {
+                    $merged[$key] = implode('|', $value);
+                }
+            }
+        }
+        else
+        {
+            $merged = call_user_func_array('array_merge', $scoped);
+        }
+
+        return $merged;
     }
 
     /**
