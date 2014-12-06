@@ -22,8 +22,8 @@
         "illuminate/http": "4.2.*"
     },
     "autoload": {
-        "psr-0": {
-            "Fadion\\ValidatorAssistant": "src/"
+        "psr-4": {
+            "Fadion\\ValidatorAssistant\\": "src"
         }
     },
     "minimum-stability": "dev"
