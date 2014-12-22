@@ -452,5 +452,28 @@ class Filters {
     {
         return intval($value, $argument);
     }
-
+    
+    /**
+    * Floatval filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return float
+    */
+    private function filterFloatval($value, $argument = null)
+    {
+        return floatval($value);
+    }
+    
+    /**
+    * Boolval filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return boolean
+    */
+    private function filterBoolval($value, $argument = null)
+    {
+        return boolval($value);
+    }
 }
