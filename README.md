@@ -289,6 +289,12 @@ $inputs = $userValidator->inputs();
 
 `numeric => converts a string to numeric characters only`
 
+`intval => intval($input, $base)`
+
+`floatval => floatval($input)`
+
+`boolval => boolval($input)`
+
 ## Scoped Rules
 
 For the same model or form, you may need to apply new rules or remove uneeded ones. Let's say that for the registration process, you just need the username and email fields, while for the profile form there are a bunch of others. Sure, you can build two different validation classes, but there's a better way. Scope!
