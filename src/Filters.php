@@ -440,5 +440,17 @@ class Filters {
     {
         return preg_replace("/[^0-9]/", '', $value);
     }
+    
+    /**
+    * Intval filter
+    *
+    * @param string $value
+    * @param string $argument
+    * @return integer
+    */
+    private function filterIntval($value, $argument = null)
+    {
+        return intval($value, $argument);
+    }
 
 }
