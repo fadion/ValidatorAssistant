@@ -22,7 +22,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 ```json
 {
     "require": {
-        "fadion/validator-assistant": "dev-master"
+        "fadion/validator-assistant": "~1.0"
     }
 }
 ```
