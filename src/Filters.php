@@ -165,9 +165,9 @@ class Filters {
     */
     private function filterStripTags($value, $argument = null)
     {
-        $allowedTags = '<p><a><b><i><em><strong><img><br><ul><ol><li><span><blockquote><code><sub><sup><h1><h2><h3><h4><h5><h6><dd><dl><label>';
+        $allowedTags = array('<p>', '<a>', '<b>', '<i>', '<em>', '<strong>', '<img>', '<br>', '<ul>', '<ol>', '<li>', '<span>', '<blockquote>', '<code>', '<sub>', '<sup>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>', '<dd>', '<dl>', '<label>');
 
-        return strip_tags($value, $allowedTags);
+        return strip_tags($value, join(null, $allowedTags));
     }
 
     /**
