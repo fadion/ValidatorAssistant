@@ -204,7 +204,7 @@ class Subrules {
                 }
             }
         }
-        
+
         $this->inputs = $inputs;
         $this->rules = $rules;
         $this->attributes = $attributes;

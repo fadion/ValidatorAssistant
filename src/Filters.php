@@ -270,7 +270,7 @@ class Filters {
         if (extension_loaded('mbstring')) {
             return mb_strtolower($value);
         }
-        
+
         return strtolower($value);
     }
 
@@ -440,7 +440,7 @@ class Filters {
     {
         return preg_replace("/[^0-9]/", '', $value);
     }
-    
+
     /**
     * Intval filter
     *
@@ -452,7 +452,7 @@ class Filters {
     {
         return intval($value, $argument);
     }
-    
+
     /**
     * Floatval filter
     *
@@ -464,7 +464,7 @@ class Filters {
     {
         return floatval($value);
     }
-    
+
     /**
     * Boolval filter
     *

@@ -30,7 +30,7 @@ Keep Laravel Controllers thin and reuse code by organizing validation rules and 
 
 ## Usage
 
-ValidatorAssistant can be extended by any PHP class that follows just a few simple rules. As a personal preference, I use an `app/validators` folder to store validation classes and have added it to the `classmap` option of composer.json for simple autoloading. Probably it's a good idea to namespace them too. 
+ValidatorAssistant can be extended by any PHP class that follows just a few simple rules. As a personal preference, I use an `app/validators` folder to store validation classes and have added it to the `classmap` option of composer.json for simple autoloading. Probably it's a good idea to namespace them too.
 
 A validation class in action is written below. Note the $rules and $messages properties. For them to be "seen" by ValidatorAssistant, their visibility needs to be `protected` or `public`, but not `private`.
 
