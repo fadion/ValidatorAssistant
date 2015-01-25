@@ -1,3 +1,7 @@
+> ValidatorAssistant was recently tagged with a 1.0 version and finally has unit tests. Please update your composer requirements as instructed in the [Installation](#installation) section. The only breaking change is the rename of `inputs()` to `getInputs()`.
+
+> To use it in Laravel 5, please see the `l5` branch.
+
 # ValidatorAssistant
 
 Keep Laravel Controllers thin and reuse code by organizing validation rules and messages into dedicated classes. ValidatorAssistant is a small library built to be extended by those classes, so they can easily use Laravel's Validation system and a few additional features like subrules, scopes and binding.
