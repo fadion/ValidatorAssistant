@@ -10,4 +10,4 @@ ValidatorAssistant for Laravel 5.
     }
 }
 ```
-- (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `app/config/app.php` file, inside the `aliases` array.
+- (Optional) Add a new alias: `'ValidatorAssistant' => 'Fadion\ValidatorAssistant\ValidatorAssistant'` to your `config/app.php` file, inside the `aliases` array.
