@@ -165,9 +165,9 @@ class Filters {
     */
     private function filterStripTags($value, $argument = null)
     {
-        $allowedTags = '<p><a><b><i><em><strong><img><br><ul><ol><li><span><blockquote><code><sub><sup><h1><h2><h3><h4><h5><h6><dd><dl><label>';
+        $allowedTags = array('<p>', '<a>', '<b>', '<i>', '<em>', '<strong>', '<img>', '<br>', '<ul>', '<ol>', '<li>', '<span>', '<blockquote>', '<code>', '<sub>', '<sup>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>', '<dd>', '<dl>', '<label>');
 
-        return strip_tags($value, $allowedTags);
+        return strip_tags($value, join(null, $allowedTags));
     }
 
     /**
@@ -270,7 +270,7 @@ class Filters {
         if (extension_loaded('mbstring')) {
             return mb_strtolower($value);
         }
-        
+
         return strtolower($value);
     }
 
@@ -440,7 +440,7 @@ class Filters {
     {
         return preg_replace("/[^0-9]/", '', $value);
     }
-    
+
     /**
     * Intval filter
     *
@@ -452,7 +452,7 @@ class Filters {
     {
         return intval($value, $argument);
     }
-    
+
     /**
     * Floatval filter
     *
@@ -464,7 +464,7 @@ class Filters {
     {
         return floatval($value);
     }
-    
+
     /**
     * Boolval filter
     *
