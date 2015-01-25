@@ -1,10 +1,8 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-use Fadion\ValidatorAssistant\Bindings;
-use Fadion\ValidatorAssistant\Subrules;
-use Fadion\ValidatorAssistant\Filters;
-use Input;
-use Validator;
+use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\App;
 
 abstract class ValidatorAssistant {
 
@@ -61,12 +59,14 @@ abstract class ValidatorAssistant {
     /**
     * Initialize the ValidatorAssistant class.
     *
-    * @param  array  $inputs
-    * @return void
+    * @param array $inputs
+    * @param \Illuminate\Validation\Validator $validator
     */
-    public function __construct($inputs = null)
+    public function __construct($inputs = null, Validator $validator = null)
     {
         $this->inputs = $inputs ?: Input::all();
+        
+        $this->validator = $validator ?: App::make('validator');
 
         // Run the 'before' method, letting the
         // user execute code before validation.
@@ -130,7 +130,7 @@ abstract class ValidatorAssistant {
         // Apply custom rules.
         $this->customRules();
 
-        $this->validator = Validator::make($this->inputs, $this->rules, $this->messages);
+        $this->validator = $this->validator->make($this->inputs, $this->rules, $this->messages);
 
         // Apply attributes.
         $this->validator->setAttributeNames($this->attributes);
@@ -148,9 +148,29 @@ abstract class ValidatorAssistant {
     *
     * @return array
     */
-    public function inputs()
+    public function getInputs()
     {
         return $this->inputs;
+    }
+
+    /**
+     * Get the rules.
+     *
+     * @return array
+     */
+    public function getRules()
+    {
+        return $this->rules;
+    }
+
+    /**
+     * Get the messages.
+     *
+     * @return array
+     */
+    public function getMessages()
+    {
+        return $this->messages;
     }
 
     /**
