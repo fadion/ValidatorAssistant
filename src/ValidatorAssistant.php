@@ -1,6 +1,6 @@
 <?php namespace Fadion\ValidatorAssistant;
 
-use Illuminate\Validation\Validator;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\App;
 
