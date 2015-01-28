@@ -19,6 +19,7 @@ class ValidatorAssistantTest extends PHPUnit_Framework_TestCase {
 
         $validator = m::mock('Illuminate\Validation\Validator');
         $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
 
         $testValidator = new TestValidator($this->inputs, $validator);
         
@@ -35,6 +36,7 @@ class ValidatorAssistantTest extends PHPUnit_Framework_TestCase {
 
         $validator = m::mock('Illuminate\Validation\Validator');
         $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
 
         $testValidator = new TestValidator($this->inputs, $validator);
 
@@ -108,6 +110,7 @@ class ValidatorAssistantTest extends PHPUnit_Framework_TestCase {
 
         $validator = m::mock('Illuminate\Validation\Validator');
         $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
 
         $testValidator = new TestValidator($this->inputs, $validator);
         $testValidator->passes();
@@ -134,6 +137,7 @@ class ValidatorAssistantTest extends PHPUnit_Framework_TestCase {
 
         $validator = m::mock('Illuminate\Validation\Validator');
         $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
 
         $inputs = array(
             'title' => array('sq' => 'Albanian', 'en' => 'English')
@@ -151,6 +155,51 @@ class ValidatorAssistantTest extends PHPUnit_Framework_TestCase {
         $this->assertArrayHasKey('title_sq.required', $messages);
         $this->assertArrayHasKey('title_en.required', $messages);
     }
+
+    public function testCustomRules()
+    {
+        $response = m::mock('StdClass');
+        $response->shouldReceive('passes', 'setAttributeNames')->once()->andReturn(true);
+        $response->shouldReceive('messages')->once();
+
+        $validator = m::mock('Illuminate\Validation\Validator');
+        $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
+
+        $inputs['bar'] = 'foobar';
+
+        $testValidator = new TestValidator($inputs, $validator);
+
+        $this->assertTrue($testValidator->passes());
+        $this->assertNull($testValidator->errors());
+    }
+
+    public function testBeforeEvent()
+    {
+        $validator = m::mock('Illuminate\Validation\Validator');
+        $testValidator = new TestValidator($this->inputs, $validator);
+        $rules = $testValidator->getRules();
+
+        $this->assertNotNull($rules['event']);
+        $this->assertEquals('before', $rules['event']);
+    }
+
+    public function testAfterEvent()
+    {
+        $response = m::mock('StdClass');
+        $response->shouldReceive('passes', 'setAttributeNames')->once()->andReturn(true);
+
+        $validator = m::mock('Illuminate\Validation\Validator');
+        $validator->shouldReceive('make')->once()->andReturn($response);
+        $validator->shouldReceive('extend')->zeroOrMoreTimes();
+
+        $testValidator = new TestValidator($this->inputs, $validator);
+        $testValidator->passes();
+        $rules = $testValidator->getRules();
+
+        $this->assertNotNull($rules['event']);
+        $this->assertEquals('after', $rules['event']);
+    }
     
 }
 
@@ -162,7 +211,9 @@ class TestValidator extends \Fadion\ValidatorAssistant\ValidatorAssistant {
         'birthday' => 'before:{date}',
         'username' => 'unique:{table}',
         'title[sq]' => 'required',
-        'title[en]' => 'required'
+        'title[en]' => 'required',
+        'bar' => 'foo',
+        'event' => null
     );
     
     protected $rulesProfile = array(
@@ -180,5 +231,20 @@ class TestValidator extends \Fadion\ValidatorAssistant\ValidatorAssistant {
         'title[sq].required' => 'Albanian title is required',
         'title[en].required' => 'English title is required'
     );
+
+    protected function customFoo($attribute, $value, $parameters)
+    {
+        return $value == 'foobar';
+    }
+
+    protected function before()
+    {
+        $this->rules['event'] = 'before';
+    }
+
+    protected function after()
+    {
+        $this->rules['event'] = 'after';
+    }
     
 }
