@@ -356,7 +356,7 @@ abstract class ValidatorAssistant {
 
                 // Extend the validator using the return value
                 // of the custom rule method.
-                Validator::extend($customRule, function($attribute, $value, $parameters) use ($self, $method) {
+                $this->validator->extend($customRule, function($attribute, $value, $parameters) use ($self, $method) {
                     return $self->$method($attribute, $value, $parameters);
                 });
             }
