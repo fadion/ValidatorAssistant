@@ -37,20 +37,22 @@ class Filters {
 
         if (count($filters)) {
             foreach ($filters as $name => $filter) {
-                $rules = explode('|', $filter);
+                // Allow filter to defined as array or pipe delimited string
+                $rules = (is_array($filter)) ? $filter : explode('|', $filter);
 
                 // At least a rule is set and the input
                 // field exists.
                 if (count($rules) and isset($inputs[$name])) {
                     foreach ($rules as $rule) {
-                        $rule = explode(':', $rule);
+                        $splitAt = strpos($rule, ':');
 
                         $argument = null;
-                        if (isset($rule[1])) {
-                            $argument = $rule[1];
+                        if ($splitAt) {
+                            $argument = substr($rule, $splitAt+1);
+                            $rule = substr($rule, 0, $splitAt);
                         }
 
-                        $rule = strtolower($rule[0]);
+                        $rule = strtolower($rule);
                         $rule = str_replace('_', ' ', $rule);
                         $rule = str_replace(' ', '', ucwords($rule));
 
