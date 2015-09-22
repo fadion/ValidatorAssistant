@@ -4,6 +4,10 @@ use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\App;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 abstract class ValidatorAssistant {
 
     /**
@@ -124,7 +128,7 @@ abstract class ValidatorAssistant {
         $this->resolveSubrules();
 
         // Apply input filters.
-        $filters = new Filters($this->inputs, $this->filters);
+        $filters = new Filters($this->inputs, $this->filters, $this);
         $this->inputs = $filters->apply();
 
         // Apply custom rules.
