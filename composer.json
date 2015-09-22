@@ -22,7 +22,8 @@
         "illuminate/http": "~4.1"
     },
     "require-dev": {
-        "mockery/mockery": "dev-master"
+        "mockery/mockery": "dev-master",
+        "phpunit/phpunit": "4.7.*"
     },
     "autoload": {
         "psr-4": {

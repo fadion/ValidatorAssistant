@@ -39,7 +39,7 @@ class Filters {
             foreach ($filters as $name => $filter) {
                 
                 // Allow filter to defined as array or pipe delimited string
-                $rules = ( is_array($filter) ) ? $filter : explode('|', $filter);
+                $rules = (is_array($filter)) ? $filter : explode('|', $filter);
 
                 // At least a rule is set and the input
                 // field exists.
@@ -48,9 +48,9 @@ class Filters {
                         $splitAt = strpos($rule, ':');
 
                         $argument = null;
-                        if ( $splitAt ) {
+                        if ($splitAt) {
                             $argument = substr($rule, $splitAt+1);
-                            $rule     = substr($rule, 0, $splitAt);
+                            $rule = substr($rule, 0, $splitAt);
                         }
 
                         $rule = strtolower($rule);
