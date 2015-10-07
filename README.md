@@ -443,7 +443,7 @@ $userValidator->bindTable('users');
 $userValidator->bindDate('2012-12-12');
 ```
 
-Each of the methods gets the same results, so use what you're more confortable with.
+Each of the methods gets the same results, so use what you're more comfortable with.
 
 ## Before and After Methods
 
