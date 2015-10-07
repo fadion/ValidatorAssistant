@@ -28,8 +28,8 @@ class Filters {
     */
     public function __construct($inputs, $filters, $assistant = null)
     {
-        $this->inputs = $inputs;
-        $this->filters = $filters;
+        $this->inputs    = $inputs;
+        $this->filters   = $filters;
         $this->assistant = $assistant;
     }
 
@@ -40,8 +40,9 @@ class Filters {
     */
     public function apply()
     {
-        $filters = $this->filters;
-        $inputs = $this->inputs;
+        $filters   = $this->filters;
+        $inputs    = $this->inputs;
+        $assistant = $this->assistant;
 
         if (count($filters)) {
             foreach ($filters as $name => $filter) {

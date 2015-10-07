@@ -4,6 +4,10 @@ use Illuminate\Validation\Validator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\App;
 
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 abstract class ValidatorAssistant {
 
     /**
@@ -222,9 +226,21 @@ abstract class ValidatorAssistant {
     */
     public function scope($scope)
     {
+        $beforeMethod = 'before'.ucfirst($scope);
+        $afterMethod  = 'after'.ucfirst($scope);
+        if ( method_exists($this, $beforeMethod) )
+        {
+            call_user_func([$this,$beforeMethod]);
+        }
         $this->rules = $this->resolveScope($scope);
         $this->attributes = $this->resolveAttributes($scope);
         $this->messages = $this->resolveMessages($scope);
+
+
+        if ( method_exists($this, $afterMethod) )
+        {
+            call_user_func([$this,$afterMethod]);
+        }
 
         return $this;
     }
