@@ -1,6 +1,6 @@
-> ValidatorAssistant was recently tagged with a 1.0 version and finally has unit tests. Please update your composer requirements as instructed in the [Installation](#installation) section. The only breaking change is the rename of `inputs()` to `getInputs()`.
+> Laravel's FormRequest does more or less the same job this package does, but better integrated in the framework. For everyone using Laravel 5, I highly recommend going for FormRequests. You won't miss any feature and since 5.2, it also supports input arrays.
 
-> To use it in Laravel 5, please see the `l5` branch.
+> I will continue supporting ValidatorAssistant for Laravel 4 users, by fixing bugs, at least until there is interest in this package. I won't be adding new features or supporting it for Laravel 5. 
 
 # ValidatorAssistant
 
