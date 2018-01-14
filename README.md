@@ -1,7 +1,5 @@
 > Laravel's FormRequest does more or less the same job this package does, but better integrated in the framework. For everyone using Laravel 5, I highly recommend going for FormRequests. You won't miss any feature and since 5.2, it also supports input arrays.
 
-> I will continue supporting ValidatorAssistant for Laravel 4 users, by fixing bugs, at least until there is interest in this package. I won't be adding new features or supporting it for Laravel 5. 
-
 # ValidatorAssistant
 
 Keep Laravel Controllers thin and reuse code by organizing validation rules and messages into dedicated classes. ValidatorAssistant is a small library built to be extended by those classes, so they can easily use Laravel's Validation system and a few additional features like subrules, scopes and binding.
